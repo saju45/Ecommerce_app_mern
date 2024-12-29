@@ -96,9 +96,9 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <li>
-              <a>Logout</a>
-            </li>
+            <Link to="/login">
+              <a>Login</a>
+            </Link>
           </ul>
           <ul
             tabIndex={0}
@@ -110,9 +110,9 @@ const Navbar = () => {
                 <span className="badge">New</span>
               </a>
             </li>
-            <li>
-              <a>Logout</a>
-            </li>
+            <Link to="/login" className="ml-2">
+              <a>Login</a>
+            </Link>
           </ul>
         </div>
       </div>

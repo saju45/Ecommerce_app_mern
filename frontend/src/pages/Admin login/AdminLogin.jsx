@@ -1,4 +1,41 @@
+import axios from "axios";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
 const AdminLogin = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const backendLink = useSelector((state) => state.prod.link);
+
+  const navigate = useNavigate();
+  console.log(backendLink);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${backendLink}/admin/login`,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast.success(response.data.message);
+      navigate("/admin-dashboard");
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response.data.error);
+    }
+  };
+
   return (
     <div className="h-screen flex items-center justify-center">
       <div className=" w-[80%] md:w-[60%] lg:w-[40%] p-12 shadow-2xl rounded flex flex-col items-center justify-center">
@@ -6,7 +43,7 @@ const AdminLogin = () => {
           <h1 className="font-bold">Admin Login!</h1>
           <span>Please login here</span>
         </div>
-        <form className="flex flex-col w-[100%] mt-8">
+        <form className="flex flex-col w-[100%] mt-8" onSubmit={handleSubmit}>
           <div className="flex flex-col mb-4">
             <label htmlFor="email">Email</label>
             <input
@@ -15,6 +52,8 @@ const AdminLogin = () => {
               placeholder="Enter your email"
               className="mt-2 outline-none border px-3 py-2 rounded border-zinc-400"
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="flex flex-col mb-4">
@@ -25,6 +64,8 @@ const AdminLogin = () => {
               placeholder="Enter your password"
               className="mt-2 outline-none border px-3 py-2 rounded border-zinc-400"
               required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <div className="flex mt-4 ">

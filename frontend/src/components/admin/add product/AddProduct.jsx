@@ -1,37 +1,65 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 const AddProductPage = () => {
+  const [brand, setBrand] = useState("");
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
+  const [rating, setRating] = useState("");
   const [category, setCategory] = useState("");
   const [stock, setStock] = useState("");
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
+  const [imagesURLS, setImagesURLS] = useState([]);
+
+  const backendLink = useSelector((state) => state.prod.link);
 
   const handleImageChange = (event) => {
     const files = Array.from(event.target.files);
+
+    setImages([...images, ...files]);
     const newImages = files.map((file) => URL.createObjectURL(file));
-    setImages([...images, ...newImages]);
+    setImagesURLS([...imagesURLS, newImages]);
   };
 
   const handleImageRemove = (index) => {
+    setImagesURLS(imagesURLS.filter((_, i) => i !== index));
     setImages(images.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const productData = {
-      productName,
-      price,
-      category,
-      stock,
-      description,
-      images,
-    };
-    console.log(productData);
-    alert("Product added successfully!");
-    // Add API integration here to submit the product
+    try {
+      const formData = new FormData();
+      formData.append("brand", brand);
+      formData.append("name", productName);
+      formData.append("price", price);
+      formData.append("rating", rating);
+      formData.append("category", category);
+      formData.append("stock", stock);
+      formData.append("description", description);
+      images.forEach((image) => formData.append("images", image));
+      const config = {
+        withCredentials: true,
+        headers: { "Content-Type": "multipart/form-data" },
+      };
+      const respnse = await axios.post(
+        `${backendLink}/products/addProduct`,
+        formData,
+        config
+      );
+      console.log(respnse);
+      alert("Product added successfully!");
+    } catch (error) {
+      console.log(error);
+    }
   };
+
+  useEffect(() => {
+    console.log(images);
+    console.log(imagesURLS);
+  }, [images, imagesURLS]);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -115,6 +143,43 @@ const AddProductPage = () => {
             required
           />
         </div>
+        {/* Product brand */}
+        <div className="flex gap-5">
+          <div className="w-1/2">
+            <label
+              htmlFor="productBrand"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Brand Name
+            </label>
+            <input
+              type="text"
+              id="productBrand"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Enter product brand name"
+              required
+            />
+          </div>
+          <div className="w-1/2">
+            <label
+              htmlFor="productName"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Rating
+            </label>
+            <input
+              type="number"
+              id="rating"
+              value={rating}
+              onChange={(e) => setRating(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Enter product rating"
+              required
+            />
+          </div>
+        </div>
 
         {/* Description */}
         <div>
@@ -153,7 +218,7 @@ const AddProductPage = () => {
           />
           {/* Image Preview */}
           <div className="mt-4 flex flex-wrap gap-4">
-            {images.map((image, index) => (
+            {imagesURLS?.map((image, index) => (
               <div key={index} className="relative">
                 <img
                   src={image}

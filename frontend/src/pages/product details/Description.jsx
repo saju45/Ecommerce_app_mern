@@ -1,5 +1,5 @@
 import NewsLetter from "../../components/home/NewsLetter";
-import ProductList from "../../components/home/ProductList";
+import ProductCard from "../../components/product/ProductCard";
 const ProductDescription = () => {
   return (
     <div className="container mx-auto p-6 pt-32">
@@ -98,7 +98,21 @@ const ProductDescription = () => {
         </div>
       </div>
 
-      <ProductList />
+      <div className="bg-white py-12">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">Related Products</h2>
+          <p className="text-gray-600">Summer Collection new modern design</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+          <ProductCard />
+        </div>
+      </div>
       <NewsLetter />
     </div>
   );

@@ -1,4 +1,5 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 import AddProductPage from "./components/admin/add product/AddProduct";
 import Customers from "./components/admin/customers/Customers";
 import Dashboard from "./components/admin/dashboard/Dashboard";
@@ -54,6 +55,7 @@ function App() {
           <Route path="*" element={() => <h1>Page Not Found</h1>} />
         </Route>
       </Routes>
+      <ToastContainer />
     </Router>
   );
 }
