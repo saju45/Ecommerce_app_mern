@@ -1,48 +1,69 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 import NewsLetter from "../../components/home/NewsLetter";
 import ProductCard from "../../components/product/ProductCard";
 const ProductDescription = () => {
+  const { id } = useParams();
+  const backendLink = useSelector((state) => state.prod.link);
+  const [product, setProduct] = useState({});
+  const [imgPosition, setImgPosition] = useState(0);
+  console.log(id);
+
+  console.log(product);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get(`${backendLink}/products/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("response : ", response);
+
+        setProduct(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProduct();
+  }, [backendLink, id]);
+
   return (
     <div className="container mx-auto p-6 pt-32">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left Section: Product Images */}
         <div>
           <img
-            src="/images/products/f1.jpg"
+            src={product?.images && product?.images[imgPosition]}
             alt="Main Product"
             className="w-full h-auto object-cover mb-4"
           />
           <div className="flex gap-2">
-            <img
-              src="/images/products/f1.jpg"
-              alt="Thumbnail 1"
-              className="w-1/4 h-auto  object-cover cursor-pointer border border-gray-200"
-            />
-            <img
-              src="/images/products/f1.jpg"
-              alt="Thumbnail 2"
-              className="w-1/4 h-auto object-cover cursor-pointer border border-gray-200"
-            />
-            <img
-              src="/images/products/f1.jpg"
-              alt="Thumbnail 3"
-              className="w-1/4 h-auto object-cover cursor-pointer border border-gray-200"
-            />
-            <img
-              src="/images/products/f1.jpg"
-              alt="Thumbnail 4"
-              className="w-1/4 h-auto object-cover cursor-pointer border border-gray-200"
-            />
+            {product?.images?.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt="Additional Product"
+                className="w-1/4 h-auto  object-cover cursor-pointer border border-gray-200"
+                onClick={() => setImgPosition(index)}
+              />
+            ))}
           </div>
         </div>
 
         {/* Right Section: Product Details */}
         <div className=" mt-4">
-          <p className="text-sm text-gray-500 mb-4">Home / T-shirt</p>
+          <p className="text-sm text-gray-500 mb-4">{product?.brand}</p>
 
           {/* Product Name */}
-          <h1 className="text-2xl font-bold mb-4">Men's Fashion T-shirt</h1>
+          <h1 className="text-2xl font-bold mb-4">{product?.name}</h1>
           {/* Product Price */}
-          <p className="text-xl font-semibold text-gray-700 mb-4">$139.00</p>
+          <p className="text-xl font-semibold text-gray-700 mb-4">
+            ${product?.price}
+          </p>
 
           {/* Size Selector */}
           <div className="mb-4">
@@ -57,10 +78,11 @@ const ProductDescription = () => {
               className="w-full p-2 border border-gray-300 rounded-md"
             >
               <option value="">Select Size</option>
-              <option value="small">Small</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large</option>
-              <option value="xl">XL</option>
+              {product?.sizes?.map((size, index) => (
+                <option key={index} value={size}>
+                  {size.toUpperCase()}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -90,9 +112,7 @@ const ProductDescription = () => {
           <div className="mt-8">
             <h2 className="text-lg font-bold mb-4">Product Details</h2>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quam
-              iure, officiis at ipsa molestias voluptas dolorum ut quis sapiente
-              itaque dicta modi? Quo earum?
+              {product?.description}
             </p>
           </div>
         </div>

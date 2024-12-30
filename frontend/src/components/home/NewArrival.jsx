@@ -1,6 +1,24 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import ProductCard from "../product/ProductCard";
-
 const NewArrivals = () => {
+  const [products, setProducts] = useState([]);
+  const backendLick = useSelector((state) => state.prod.link);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${backendLick}/products/fetchNewArrivals`
+        );
+        setProducts(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProducts();
+  }, [backendLick]);
   return (
     <div className="bg-white py-12">
       <div className="text-center mb-8">
@@ -8,13 +26,10 @@ const NewArrivals = () => {
         <p className="text-gray-600">Summer Collection new morden design</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 px-10 md:px-20">
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-10 md:px-20">
+        {products?.map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
       </div>
     </div>
   );

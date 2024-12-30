@@ -1,9 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 const AddProductPage = () => {
   const [brand, setBrand] = useState("");
+  const [size, setSize] = useState("");
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [rating, setRating] = useState("");
@@ -12,6 +14,7 @@ const AddProductPage = () => {
   const [description, setDescription] = useState("");
   const [images, setImages] = useState([]);
   const [imagesURLS, setImagesURLS] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const backendLink = useSelector((state) => state.prod.link);
 
@@ -23,6 +26,19 @@ const AddProductPage = () => {
     setImagesURLS([...imagesURLS, newImages]);
   };
 
+  //reset from
+  const reset = () => {
+    setBrand("");
+    setProductName("");
+    setPrice("");
+    setRating("");
+    setCategory("");
+    setStock("");
+    setDescription("");
+    setImages([]);
+    setImagesURLS([]);
+  };
+
   const handleImageRemove = (index) => {
     setImagesURLS(imagesURLS.filter((_, i) => i !== index));
     setImages(images.filter((_, i) => i !== index));
@@ -30,16 +46,25 @@ const AddProductPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    //split sizez value by coma
+    const sizesArr = size.split(",").map((s) => s.trim());
+    console.log(sizesArr);
+
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append("brand", brand);
       formData.append("name", productName);
+      formData.append("sizes", JSON.stringify(sizesArr));
       formData.append("price", price);
       formData.append("rating", rating);
       formData.append("category", category);
       formData.append("stock", stock);
       formData.append("description", description);
       images.forEach((image) => formData.append("images", image));
+
+      console.log(formData);
+
       const config = {
         withCredentials: true,
         headers: { "Content-Type": "multipart/form-data" },
@@ -49,17 +74,21 @@ const AddProductPage = () => {
         formData,
         config
       );
-      console.log(respnse);
-      alert("Product added successfully!");
+      setLoading(false);
+      toast.success(respnse.data.message);
+      reset();
     } catch (error) {
       console.log(error);
+      toast.error(error.response.data.error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     console.log(images);
     console.log(imagesURLS);
-  }, [images, imagesURLS]);
+    console.log(size);
+  }, [images, imagesURLS, size]);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -87,23 +116,42 @@ const AddProductPage = () => {
           />
         </div>
 
-        {/* Price */}
-        <div>
-          <label
-            htmlFor="price"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Price
-          </label>
-          <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            placeholder="Enter price"
-            required
-          />
+        {/* Price and sizes */}
+
+        <div className="flex gap-5">
+          <div className="w-1/2">
+            <label
+              htmlFor="price"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Price
+            </label>
+            <input
+              type="number"
+              id="price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Enter price"
+              required
+            />
+          </div>
+          <div className="w-1/2">
+            <label
+              htmlFor="size"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Size
+            </label>
+            <input
+              type="text"
+              id="size"
+              onChange={(e) => setSize(e.target.value)}
+              className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Enter product coma separet size"
+              required
+            />
+          </div>
         </div>
 
         {/* Category */}
@@ -143,7 +191,7 @@ const AddProductPage = () => {
             required
           />
         </div>
-        {/* Product brand */}
+        {/* Product brand  and rating*/}
         <div className="flex gap-5">
           <div className="w-1/2">
             <label
@@ -239,12 +287,18 @@ const AddProductPage = () => {
 
         {/* Submit Button */}
         <div>
-          <button
-            type="submit"
-            className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-600"
-          >
-            Add Product
-          </button>
+          {loading ? (
+            <button className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-600">
+              Loading...
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-600"
+            >
+              Add Product
+            </button>
+          )}
         </div>
       </form>
     </div>

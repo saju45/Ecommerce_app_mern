@@ -1,10 +1,18 @@
 import express from "express";
-import { addProduct } from "../controller/productController.js";
+import {
+  addProduct,
+  getAllProducts,
+  getNewArrivalsProducts,
+  getProductById,
+} from "../controller/productController.js";
 import { authMiddlware } from "../middleware/authMiddleware.js";
 import upload from "../middleware/imageUpload.js";
 
 const router = express();
 
+router.get("/fetchAllProduct", getAllProducts);
+router.get("/fetchNewArrivals", getNewArrivalsProducts);
+router.get("/:id", getProductById);
 router.post(
   "/addProduct",
   authMiddlware.verify,

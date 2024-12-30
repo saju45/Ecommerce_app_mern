@@ -1,6 +1,25 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Newsletter from "../../components/home/NewsLetter";
 import ProductCard from "../../components/product/ProductCard";
 const Shop = () => {
+  const [products, setProducts] = useState([]);
+  const backendLick = useSelector((state) => state.prod.link);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(
+          `${backendLick}/products/fetchAllProduct`
+        );
+        setProducts(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProducts();
+  }, [backendLick]);
   return (
     <div>
       {/* Page Header Section */}
@@ -15,13 +34,10 @@ const Shop = () => {
       </div>
 
       {/* Shop Products Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 py-20 px-10 md:px-20">
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 py-20 px-10 md:px-20">
+        {products?.map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
       </div>
 
       {/* Pagination Section */}
