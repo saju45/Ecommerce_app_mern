@@ -1,4 +1,7 @@
+import {useNavigate} from "react-router-dom";
 const Hero = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="h-[100vh] w-full bg-cover bg-[url('images/hero4.png')]  bg-[top_25%_right_0]  flex flex-col justify-center items-start">
       <div className="container mx-auto px-6 lg:px-20 grid grid-cols-1 lg:grid-cols-2 items-center gap-6">
@@ -13,7 +16,7 @@ const Hero = () => {
           <p className="text-gray-600 mt-4">
             Save more with coupons &amp; up to 70% off!
           </p>
-          <button className="mt-6 px-6 py-3 bg-teal-600 text-white font-medium rounded-md shadow-md hover:bg-teal-500 transition">
+          <button className="mt-6 px-6 py-3 bg-teal-600 text-white font-medium rounded-md shadow-md hover:bg-teal-500 transition" onClick={()=>navigate("/shop")}>
             Shop Now
           </button>
         </div>

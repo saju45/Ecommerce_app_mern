@@ -2,10 +2,39 @@
 
 import { RiStarFill, RiStarHalfLine, RiStarLine } from "react-icons/ri";
 
+import axios from "axios";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
+
+  const backendLink = useSelector((state) => state.prod.link);
+  const handleAddToCart = async () => {
+    try {
+      const response = await axios.put(
+        `${backendLink}/cart/add-to-cart`,
+        {
+          productid: product?._id,
+          quantity: 1,
+          price: product?.price,
+          name: product?.name,
+          image: product?.images[0],
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+      toast.success(response.data.message);
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.error);
+    }
+  };
+
   return (
     <div className="border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition p-4">
       <div className="flex justify-center mb-4">
@@ -34,7 +63,7 @@ const ProductCard = ({ product }) => {
       <p className="mt-2 text-lg text-gray-900 font-semibold">
         ${product?.price}
       </p>
-      <div className="flex justify-end mt-4">
+      <div className="flex justify-end mt-4" onClick={handleAddToCart}>
         <button className="p-2 bg-green-500 text-white rounded-full hover:bg-green-400 transition">
           <svg
             xmlns="http://www.w3.org/2000/svg"

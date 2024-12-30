@@ -2,16 +2,39 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import NewsLetter from "../../components/home/NewsLetter";
 import ProductCard from "../../components/product/ProductCard";
 const ProductDescription = () => {
   const { id } = useParams();
   const backendLink = useSelector((state) => state.prod.link);
   const [product, setProduct] = useState({});
+  const [relaredProducts, setRelatedProducts] = useState([]);
   const [imgPosition, setImgPosition] = useState(0);
-  console.log(id);
+  const [quantity, setQuantity] = useState(1);
 
-  console.log(product);
+  const handleAddToCart = async () => {
+    try {
+      const response = await axios.put(
+        `${backendLink}/cart/add-to-cart`,
+        {
+          productid: id,
+          quantity,
+          price: product?.price,
+          name: product?.name,
+          image: product?.images[0],
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      console.log(response);
+      toast.success(response.data.message);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -21,8 +44,6 @@ const ProductDescription = () => {
             "Content-Type": "application/json",
           },
         });
-        console.log("response : ", response);
-
         setProduct(response.data);
       } catch (error) {
         console.error(error);
@@ -30,6 +51,26 @@ const ProductDescription = () => {
     };
     fetchProduct();
   }, [backendLink, id]);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get(
+          `${backendLink}/products/fetchProductByCategory/${product?.category}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        setRelatedProducts(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProduct();
+  }, [backendLink, id, product]);
 
   return (
     <div className="container mx-auto p-6 pt-32">
@@ -98,13 +139,18 @@ const ProductDescription = () => {
               id="quantity"
               type="number"
               defaultValue={1}
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
               min={1}
               className="w-16 p-2 border border-gray-300 rounded-md text-center"
             />
           </div>
 
           {/* Add to Cart Button */}
-          <button className="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700">
+          <button
+            className="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700"
+            onClick={handleAddToCart}
+          >
             Add to Cart
           </button>
 
@@ -125,12 +171,9 @@ const ProductDescription = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
-          <ProductCard />
+          {relaredProducts.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
         </div>
       </div>
       <NewsLetter />

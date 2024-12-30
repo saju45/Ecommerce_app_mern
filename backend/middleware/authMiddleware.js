@@ -26,8 +26,6 @@ export const authMiddlware = {
   },
   authorizeRole: (role) => {
     return async (req, res, next) => {
-      console.log(req.user);
-
       if (req.user.role !== role) {
         return res
           .status(403)
