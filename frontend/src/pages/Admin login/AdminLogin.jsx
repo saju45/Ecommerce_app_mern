@@ -1,14 +1,16 @@
 import axios from "axios";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { login } from "../../store/auth";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const backendLink = useSelector((state) => state.prod.link);
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   console.log(backendLink);
 
@@ -28,6 +30,7 @@ const AdminLogin = () => {
           },
         }
       );
+      dispatch(login());
       toast.success(response.data.message);
       navigate("/admin-dashboard");
     } catch (error) {

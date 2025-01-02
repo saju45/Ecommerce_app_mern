@@ -1,7 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { logout } from "../../store/auth";
 
 const Navbar = () => {
   const [cartData, setCartData] = useState([]);
@@ -14,8 +16,31 @@ const Navbar = () => {
     { name: "Contact", to: "/contact" },
   ];
 
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const backendLink = useSelector((state) => state.prod.link);
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(
+        `${backendLink}/users/logout`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      localStorage.clear();
+      toast.success(response.data.message);
+      dispatch(logout());
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.error);
+    }
+  };
 
   const subTotal = cartData?.reduce((amout, item) => {
     return amout + item.quantity * item.price;
@@ -42,7 +67,7 @@ const Navbar = () => {
         <img src="/images/logo.png" alt="logo" />
       </div>
       <div className=" md:flex-none">
-        <ul className="hidden md:flex gap-4">
+        <ul className="hidden md:flex gap-4 mr-5">
           {links.map((link, index) => (
             <Link
               key={index}
@@ -53,48 +78,55 @@ const Navbar = () => {
             </Link>
           ))}
         </ul>
-        <div className="dropdown dropdown-end">
-          <div tabIndex={0} role="button" className="btn btn-ghost btn-circle">
-            <div className="indicator">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <span className="badge badge-sm indicator-item">
-                {cartData?.length}
-              </span>
-            </div>
-          </div>
-          <div
-            tabIndex={0}
-            className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
-          >
-            <div className="card-body">
-              <span className="text-lg font-bold">
-                {cartData?.length} Items
-              </span>
-              <span className="text-info">Subtotal: ${subTotal}</span>
-              <div className="card-actions">
-                <button
-                  className="btn btn-primary btn-block"
-                  onClick={() => navigate("/cart")}
+        {isLoggedIn && (
+          <div className="dropdown dropdown-end">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost btn-circle"
+            >
+              <div className="indicator">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  View cart
-                </button>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                  />
+                </svg>
+                <span className="badge badge-sm indicator-item">
+                  {cartData?.length}
+                </span>
+              </div>
+            </div>
+            <div
+              tabIndex={0}
+              className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
+            >
+              <div className="card-body">
+                <span className="text-lg font-bold">
+                  {cartData?.length} Items
+                </span>
+                <span className="text-info">Subtotal: ${subTotal}</span>
+                <div className="card-actions">
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={() => navigate("/cart")}
+                  >
+                    View cart
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
         <div className="dropdown dropdown-end">
           <div
             tabIndex={0}
@@ -127,9 +159,16 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <Link to="/login">
-              <a>Login</a>
-            </Link>
+            {isLoggedIn ? (
+              <button
+                className="py-2 px-4 rounded bg-black text-white hover:bg-blue-600"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            ) : (
+              <Link to="/login">Login</Link>
+            )}
           </ul>
           <ul
             tabIndex={0}
@@ -141,9 +180,15 @@ const Navbar = () => {
                 <span className="badge">New</span>
               </a>
             </li>
-            <Link to="/login" className="ml-2">
-              <a>Login</a>
-            </Link>
+            {isLoggedIn ? (
+              <button className="ml-2" onClick={handleLogout}>
+                Logout
+              </button>
+            ) : (
+              <Link to="/login" className="ml-2">
+                Login
+              </Link>
+            )}
           </ul>
         </div>
       </div>

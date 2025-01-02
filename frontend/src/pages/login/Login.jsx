@@ -1,13 +1,16 @@
 import axios from "axios";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { login } from "../../store/auth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -27,12 +30,15 @@ const Login = () => {
         }
       );
 
+      console.log(response);
+
       toast.success(response.data.message);
+      localStorage.setItem("token", response.data.token);
+      dispatch(login());
 
       navigate("/");
     } catch (error) {
       console.log(error);
-
       toast.error(error.response.data.error);
     }
   };

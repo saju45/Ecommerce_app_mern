@@ -1,3 +1,4 @@
+import { useDispatch } from "react-redux";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import AddBlog from "./components/admin/add blog/AddBlog";
@@ -9,6 +10,8 @@ import EditBlog from "./components/admin/edit blog/EditBlog";
 import EditProduct from "./components/admin/edit product/EditProduct";
 import Orders from "./components/admin/orders/Orders";
 import Products from "./components/admin/products/Products";
+import AdminProtectedRoute from "./components/protectedRoute/AdminProtectedRoute";
+import ProtectedRoute from "./components/protectedRoute/ProtectedRoute";
 import MainLayout from "./layout/MainLayout";
 import OtherLayout from "./layout/OtherLayout";
 import About from "./pages/about/About";
@@ -23,15 +26,31 @@ import Login from "./pages/login/Login";
 import ProductDescription from "./pages/product details/Description";
 import Shop from "./pages/Shop/Shop";
 import Signup from "./pages/signup/Signup";
+import { login } from "./store/auth";
 
 function App() {
+  const token = localStorage.getItem("token");
+
+  const dispatch = useDispatch();
+
+  if (token) {
+    dispatch(login());
+  }
+
   return (
     <Router>
       <Routes>
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="/shop" element={<Shop />} />
-          <Route path="/blog" element={<Blog />} />
+          <Route
+            path="/blog"
+            element={
+              <ProtectedRoute>
+                <Blog />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/blog/description/:id" element={<BlogDescription />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
@@ -43,7 +62,14 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />}>
+          <Route
+            path="/admin-dashboard"
+            element={
+              <AdminProtectedRoute>
+                <AdminDashboard />
+              </AdminProtectedRoute>
+            }
+          >
             <Route index element={<Dashboard />} />
             <Route path="/admin-dashboard/products" element={<Products />} />
             <Route path="/admin-dashboard/blogs" element={<Blogs />} />
