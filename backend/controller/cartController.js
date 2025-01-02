@@ -52,6 +52,48 @@ export const addToCart = async (req, res) => {
   }
 };
 
+export const updateCartQuantity = async (req, res) => {
+  try {
+    const { productid, quantity } = req.body;
+
+    if (!productid || !quantity) {
+      return res
+        .status(400)
+        .json({ error: "Please Provide productId and quantity " });
+    }
+
+    if (!req.user) {
+      return res
+        .status(400)
+        .json({ error: "User not found, please provide valid userId" });
+    }
+
+    const userData = await User.findById(req.user._id);
+
+    if (!userData) {
+      return res
+        .status(400)
+        .json({ error: "User not found, please provide valid userId" });
+    }
+
+    const cart = await Cart.findOneAndUpdate(
+      { userId: req.user._id, "items.productId": productid },
+      { $set: { "items.$.quantity": quantity } },
+      { new: true }
+    );
+
+    if (!cart) {
+      return res.status(404).json({ error: "Cart or item not found" });
+    }
+    res
+      .status(200)
+      .json({ message: "Cart Quantity update successfully", cart });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("There was an server side error");
+  }
+};
+
 export const removeFromCart = async (req, res) => {
   try {
     const { productid } = req.headers;

@@ -1,5 +1,11 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+
 const Navbar = () => {
+  const [cartData, setCartData] = useState([]);
+
   const links = [
     { name: "Home", to: "/" },
     { name: "Shop", to: "/shop" },
@@ -9,6 +15,27 @@ const Navbar = () => {
   ];
 
   const navigate = useNavigate();
+  const backendLink = useSelector((state) => state.prod.link);
+
+  const subTotal = cartData?.reduce((amout, item) => {
+    return amout + item.quantity * item.price;
+  }, 0);
+
+  useEffect(() => {
+    const fetchCartData = async () => {
+      try {
+        const response = await axios.get(`${backendLink}/cart/getCartData`, {
+          withCredentials: true,
+        });
+
+        setCartData(response.data.items);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCartData();
+  }, [backendLink]);
   return (
     <div className="navbar  bg-[#E3E6F3] px-0  md:px-10 border-b border-gray-300 z-50 fixed ">
       <div className="flex-1" onClick={() => navigate("/")}>
@@ -43,7 +70,9 @@ const Navbar = () => {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                 />
               </svg>
-              <span className="badge badge-sm indicator-item">8</span>
+              <span className="badge badge-sm indicator-item">
+                {cartData?.length}
+              </span>
             </div>
           </div>
           <div
@@ -51,8 +80,10 @@ const Navbar = () => {
             className="card card-compact dropdown-content bg-base-100 z-[1] mt-3 w-52 shadow"
           >
             <div className="card-body">
-              <span className="text-lg font-bold">8 Items</span>
-              <span className="text-info">Subtotal: $999</span>
+              <span className="text-lg font-bold">
+                {cartData?.length} Items
+              </span>
+              <span className="text-info">Subtotal: ${subTotal}</span>
               <div className="card-actions">
                 <button
                   className="btn btn-primary btn-block"

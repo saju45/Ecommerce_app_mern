@@ -122,3 +122,64 @@ export const addProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const updateProduct = async (req, res) => {
+  try {
+    const { name, price, category, stock, sizes, brand, rating, description } =
+      req.body;
+
+    const { productid } = req.headers;
+
+    if (!productid) {
+      return res.status(400).json({ error: "Please provide productId " });
+    }
+
+    if (
+      !name ||
+      !price ||
+      !category ||
+      !stock ||
+      !sizes ||
+      !brand ||
+      !rating ||
+      !description
+    ) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const data = await Product.findByIdAndUpdate(productid, req.body, {
+      new: true,
+    });
+
+    if (!data) {
+      return res.status(401).json({ error: "update failed" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "product update successfully ", product: data });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "There was an error in server side" });
+  }
+};
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: "pleease provide productid" });
+    }
+
+    const product = await Product.findByIdAndDelete(id);
+    if (!product) {
+      return res.status(404).json({ error: "product not found" });
+    }
+
+    res.status(200).json({ message: `${product.name} deleted successfully` });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("There was an error in server side ");
+  }
+};

@@ -1,18 +1,42 @@
+/* eslint-disable react/prop-types */
+import axios from "axios";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-const AdminProductCard = () => {
+import { toast } from "react-toastify";
+
+const AdminProductCard = ({ product }) => {
+  const backendLink = useSelector((state) => state.prod.link);
+  const handleDelete = async () => {
+    try {
+      const response = await axios.delete(
+        `${backendLink}/products/${product?._id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(response);
+      toast.success(response.data.message);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.error);
+    }
+  };
+
   return (
     <div className="border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition p-4">
       <div className="flex justify-center mb-4">
         <img
-          src="/images/products/f1.jpg"
+          src={product?.images[0]}
           alt="Cotton Astronaut T-shirt"
           className="h-40"
         />
       </div>
-      <h3 className="text-sm text-gray-600">adidas</h3>
-      <h4 className="text-lg font-semibold text-gray-800">
-        Cotton Astronaut T-shirt
-      </h4>
+      <h3 className="text-sm text-gray-600">{product?.brand}</h3>
+      <h4 className="text-lg font-semibold text-gray-800">{product?.name}</h4>
       <div className="flex items-center text-yellow-400 text-sm mt-1">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -56,15 +80,20 @@ const AdminProductCard = () => {
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.6 4.92a1 1 0 00.95.69h5.181c.969 0 1.371 1.24.588 1.81l-4.193 3.05a1 1 0 00-.364 1.118l1.6 4.92c.3.921-.755 1.688-1.538 1.118l-4.193-3.05a1 1 0 00-1.176 0l-4.193 3.05c-.783.57-1.838-.197-1.538-1.118l1.6-4.92a1 1 0 00-.364-1.118L2.34 9.347c-.783-.57-.381-1.81.588-1.81h5.181a1 1 0 00.95-.69l1.6-4.92z" />
         </svg>
       </div>
-      <p className="mt-2 text-lg text-gray-900 font-semibold">$78</p>
+      <p className="mt-2 text-lg text-gray-900 font-semibold">
+        ${product?.price}
+      </p>
       <div className="flex justify-between mt-4">
         <Link
-          to="/admin-dashboard/editProduct/12"
+          to={`/admin-dashboard/editProduct/${product?._id}`}
           className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 "
         >
           Edit
         </Link>
-        <button className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+        <button
+          className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          onClick={handleDelete}
+        >
           Delete
         </button>
       </div>

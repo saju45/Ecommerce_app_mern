@@ -1,33 +1,15 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { FaTimesCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import { toast } from "react-toastify";
+import CartCard from "../../components/cart/CartCard";
 const Cart = () => {
   const [cartData, setCartData] = useState([]);
 
   const backendLink = useSelector((state) => state.prod.link);
 
-  const handleRemovedCartData = async (productid) => {
-    try {
-      const response = await axios.put(
-        `${backendLink}/cart/removeCartData`,
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            productid,
-          },
-        }
-      );
-
-      toast.success(response.data.message);
-      window.location.reload();
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.message);
-    }
-  };
+  const subTotal = cartData?.reduce((amout, item) => {
+    return amout + item.quantity * item.price;
+  }, 0);
 
   useEffect(() => {
     const fetchCartData = async () => {
@@ -71,34 +53,7 @@ const Cart = () => {
           </thead>
           <tbody>
             {cartData?.map((item, index) => (
-              <tr key={index}>
-                <td
-                  className="w-24 text-center text-sm py-4"
-                  onClick={() => handleRemovedCartData(item?.productId)}
-                >
-                  <FaTimesCircle />
-                </td>
-                <td className="w-36 text-center text-sm py-4">
-                  <img
-                    src={item?.image}
-                    alt="Product"
-                    className="w-[80px] h-full object-cover"
-                  />
-                </td>
-                <td className="w-64 text-center text-sm py-4">{item?.name}</td>
-                <td className="w-36 text-center text-sm py-4">
-                  ${item?.price}
-                </td>
-                <td className="w-36 text-center text-sm py-4">
-                  <input
-                    type="text"
-                    className="w-16 px-4 py-2 border border-gray-300"
-                    placeholder="1"
-                    value={item?.quantity}
-                  />
-                </td>
-                <td className="w-36 text-center text-sm py-4">$118.09 </td>
-              </tr>
+              <CartCard key={index} item={item} />
             ))}
           </tbody>
         </table>
@@ -133,7 +88,7 @@ const Cart = () => {
                     Subtotal
                   </td>
                   <td className="w-1/2 border border-gray-300 p-2.5 text-sm">
-                    $200
+                    ${subTotal}
                   </td>
                 </tr>
                 <tr>
@@ -149,7 +104,7 @@ const Cart = () => {
                     Total
                   </td>
                   <td className="w-1/2 border border-gray-300 p-2.5 text-sm">
-                    $220
+                    ${subTotal}
                   </td>
                 </tr>
               </tbody>

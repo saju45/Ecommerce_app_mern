@@ -1,22 +1,29 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
 
 const EditProduct = () => {
-  const [productName, setProductName] = useState("");
-  const [price, setPrice] = useState("");
-  const [category, setCategory] = useState("");
-  const [stock, setStock] = useState("");
-  const [description, setDescription] = useState("");
-  const [images, setImages] = useState([]);
+  const [product, setProduct] = useState({
+    brand: "",
+    sizes: [],
+    name: "",
+    price: "",
+    rating: "",
+    category: "",
+    stock: "",
+    description: "",
+    images: [],
+  });
 
-  const handleImageChange = (event) => {
-    const files = Array.from(event.target.files);
-    const newImages = files.map((file) => URL.createObjectURL(file));
-    setImages([...images, ...newImages]);
-  };
+  const [size, setSize] = useState("");
 
-  const handleImageRemove = (index) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
+  console.log(product);
+  const [loading, setLoading] = useState(false);
+
+  const { id } = useParams();
+
+  const backendLink = useSelector((state) => state.prod.link);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -33,9 +40,39 @@ const EditProduct = () => {
     // Add API integration here to submit the product
   };
 
+  const handleChangeSize = (e) => {
+    const sizesArr = e.target.value.split(",").map((s) => s.trim());
+    setSize(e.target.value);
+    setProduct({ ...product, sizes: sizesArr });
+  };
+
+  const handleChanged = (e) => {
+    const { id, value } = e.target;
+    if (id !== "sizes") {
+      setProduct({ ...product, [id]: value });
+    }
+  };
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get(`${backendLink}/products/${id}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        setProduct(response.data);
+        setSize(response.data.sizes.join(","));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProduct();
+  }, [backendLink, id]);
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Add Product</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Edit Product</h1>
       <form
         onSubmit={handleSubmit}
         className="bg-white p-6 shadow-md rounded-lg space-y-6"
@@ -43,39 +80,59 @@ const EditProduct = () => {
         {/* Product Name */}
         <div>
           <label
-            htmlFor="productName"
+            htmlFor="name"
             className="block text-sm font-medium text-gray-700"
           >
             Product Name
           </label>
           <input
             type="text"
-            id="productName"
-            value={productName}
-            onChange={(e) => setProductName(e.target.value)}
+            id="name"
+            value={product?.name}
+            onChange={handleChanged}
             className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             placeholder="Enter product name"
             required
           />
         </div>
 
-        {/* Price */}
-        <div>
-          <label
-            htmlFor="price"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Price
-          </label>
-          <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            placeholder="Enter price"
-            required
-          />
+        {/* Price and sizes */}
+
+        <div className="flex gap-5">
+          <div className="w-1/2">
+            <label
+              htmlFor="price"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Price
+            </label>
+            <input
+              type="number"
+              id="price"
+              value={product?.price}
+              onChange={handleChanged}
+              className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Enter price"
+              required
+            />
+          </div>
+          <div className="w-1/2">
+            <label
+              htmlFor="sizes"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Sizes
+            </label>
+            <input
+              type="text"
+              id="sizes"
+              value={size}
+              onChange={handleChangeSize}
+              className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Enter product coma separet size"
+              required
+            />
+          </div>
         </div>
 
         {/* Category */}
@@ -89,8 +146,8 @@ const EditProduct = () => {
           <input
             type="text"
             id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            value={product?.category}
+            onChange={handleChanged}
             className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             placeholder="Enter category"
             required
@@ -108,12 +165,49 @@ const EditProduct = () => {
           <input
             type="number"
             id="stock"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
+            value={product?.stock}
+            onChange={handleChanged}
             className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             placeholder="Enter stock quantity"
             required
           />
+        </div>
+        {/* Product brand  and rating*/}
+        <div className="flex gap-5">
+          <div className="w-1/2">
+            <label
+              htmlFor="brand"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Brand Name
+            </label>
+            <input
+              type="text"
+              id="brand"
+              value={product?.brand}
+              onChange={handleChanged}
+              className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Enter product brand name"
+              required
+            />
+          </div>
+          <div className="w-1/2">
+            <label
+              htmlFor="rating"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Rating
+            </label>
+            <input
+              type="number"
+              id="rating"
+              value={product?.rating}
+              onChange={handleChanged}
+              className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+              placeholder="Enter product rating"
+              required
+            />
+          </div>
         </div>
 
         {/* Description */}
@@ -126,8 +220,8 @@ const EditProduct = () => {
           </label>
           <textarea
             id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={product?.description}
+            onChange={handleChanged}
             className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
             placeholder="Enter product description"
             rows="4"
@@ -135,51 +229,20 @@ const EditProduct = () => {
           />
         </div>
 
-        {/* Image Upload */}
-        <div>
-          <label
-            htmlFor="images"
-            className="block text-sm font-medium text-gray-700"
-          >
-            Upload Images
-          </label>
-          <input
-            type="file"
-            id="images"
-            multiple
-            accept="image/*"
-            onChange={handleImageChange}
-            className="mt-1 block w-full text-gray-600"
-          />
-          {/* Image Preview */}
-          <div className="mt-4 flex flex-wrap gap-4">
-            {images.map((image, index) => (
-              <div key={index} className="relative">
-                <img
-                  src={image}
-                  alt={`Product Preview ${index}`}
-                  className="w-32 h-32 object-cover rounded-md shadow"
-                />
-                <button
-                  type="button"
-                  onClick={() => handleImageRemove(index)}
-                  className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600"
-                >
-                  &times;
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Submit Button */}
         <div>
-          <button
-            type="submit"
-            className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-600"
-          >
-            Add Product
-          </button>
+          {loading ? (
+            <button className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-600">
+              Loading...
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="w-full bg-indigo-500 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-600"
+            >
+              update Product
+            </button>
+          )}
         </div>
       </form>
     </div>

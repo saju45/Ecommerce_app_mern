@@ -1,7 +1,27 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import BlogCard from "../../components/blog/BlogCard";
 import Newsletter from "../../components/home/NewsLetter";
-
 const Blog = () => {
+  const [blogs, setBlogs] = useState([]);
+
+  const backendLink = useSelector((state) => state.prod.link);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await axios.get(`${backendLink}/blog/fetchAllBlogs`);
+        setBlogs(response.data);
+        console.log(response);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchBlogs();
+  }, [backendLink]);
+
   return (
     <div>
       <div
@@ -13,10 +33,9 @@ const Blog = () => {
           read all case studies about our products
         </p>
       </div>
-
-      <BlogCard />
-      <BlogCard />
-      <BlogCard />
+      {blogs?.map((blog) => (
+        <BlogCard key={blog?._id} blog={blog} />
+      ))}
 
       <div
         id="pagination"

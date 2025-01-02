@@ -1,10 +1,12 @@
 import express from "express";
 import {
   addProduct,
+  deleteProduct,
   getAllProducts,
   getNewArrivalsProducts,
   getProductByCategory,
   getProductById,
+  updateProduct,
 } from "../controller/productController.js";
 import { authMiddlware } from "../middleware/authMiddleware.js";
 import upload from "../middleware/imageUpload.js";
@@ -21,6 +23,20 @@ router.post(
   authMiddlware.authorizeRole("admin"),
   upload.array("images", 5),
   addProduct
+);
+
+router.put(
+  "/updateProduct",
+  authMiddlware.verify,
+  authMiddlware.authorizeRole("admin"),
+  updateProduct
+);
+
+router.delete(
+  "/:id",
+  authMiddlware.verify,
+  authMiddlware.authorizeRole("admin"),
+  deleteProduct
 );
 
 export default router;

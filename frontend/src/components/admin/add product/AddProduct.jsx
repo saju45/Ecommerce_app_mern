@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -48,7 +48,6 @@ const AddProductPage = () => {
     e.preventDefault();
     //split sizez value by coma
     const sizesArr = size.split(",").map((s) => s.trim());
-    console.log(sizesArr);
 
     try {
       setLoading(true);
@@ -83,12 +82,6 @@ const AddProductPage = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log(images);
-    console.log(imagesURLS);
-    console.log(size);
-  }, [images, imagesURLS, size]);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">

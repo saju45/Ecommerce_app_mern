@@ -30,6 +30,20 @@ const Sidebar = ({ onToggleSidebar, showSidebar }) => {
         >
           Products
         </Link>
+
+        <Link
+          to="/admin-dashboard/blogs"
+          className="block p-2 rounded-md text-gray-700 hover:bg-gray-200"
+        >
+          All Blogs
+        </Link>
+
+        <Link
+          to="/admin-dashboard/addBlog"
+          className="block p-2 rounded-md text-gray-700 hover:bg-gray-200"
+        >
+          Add Blogs
+        </Link>
         <Link
           to="/admin-dashboard/oreders"
           className="block p-2 rounded-md text-gray-700 hover:bg-gray-200"

@@ -3,6 +3,7 @@ import {
   addToCart,
   getCartData,
   removeFromCart,
+  updateCartQuantity,
 } from "../controller/cartController.js";
 import { authMiddlware } from "../middleware/authMiddleware.js";
 
@@ -20,6 +21,13 @@ router.put(
   authMiddlware.verify,
   authMiddlware.authorizeRole("user"),
   removeFromCart
+);
+
+router.put(
+  "/updateCart",
+  authMiddlware.verify,
+  authMiddlware.authorizeRole("user"),
+  updateCartQuantity
 );
 
 router.get(
