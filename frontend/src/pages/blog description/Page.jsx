@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const BlogDescription = () => {
   const [blog, setBlog] = useState({});
@@ -11,6 +12,38 @@ const BlogDescription = () => {
   const { id } = useParams();
 
   const backendLink = useSelector((state) => state.prod.link);
+
+  const handleFavourite = async () => {
+    if (favourites) {
+      try {
+        const response = await axios.put(
+          `${backendLink}/blog/removeFromFavourite/${id}`,
+          {},
+          { withCredentials: true }
+        );
+
+        setFavourites(false);
+        toast.success(response.data.message);
+      } catch (error) {
+        console.log(error);
+        toast.error(error.response.data.error);
+      }
+    } else {
+      try {
+        const response = await axios.put(
+          `${backendLink}/blog/addToFavourite/${id}`,
+          {},
+          { withCredentials: true }
+        );
+
+        setFavourites(true);
+        toast.success(response.data.message);
+      } catch (error) {
+        console.log(error);
+        toast.error(error.response.data.error);
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -22,7 +55,14 @@ const BlogDescription = () => {
           }
         );
         setBlog(response.data.blog);
-        if (response.data.favourite === true) {
+
+        console.log(response);
+
+        const isFavourite = response.data.blog.favouriteBlogByUser.find(
+          (id) => id.toString() === id
+        );
+
+        if (isFavourite) {
           setFavourites(true);
         } else {
           setFavourites(false);
@@ -40,7 +80,7 @@ const BlogDescription = () => {
       <div className=" w-full flex items-center justify-center">
         <h1 className="text-2xl font-semibold w-5/6">{blog?.title}</h1>
         <div className="w-1/6 text-2xl lg:text-3xl flex justify-end">
-          <button>
+          <button onClick={handleFavourite}>
             {favourites ? (
               <FaHeart className="hover:cursor-pointer text-red-400" />
             ) : (

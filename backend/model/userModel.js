@@ -27,6 +27,12 @@ const userSchema = new mongoose.Schema(
     token: {
       type: String,
     },
+    favouriteBlogs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Blog",
+      },
+    ],
     carts: [
       {
         type: mongoose.Schema.Types.ObjectId,

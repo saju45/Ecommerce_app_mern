@@ -14,6 +14,12 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    favouriteBlogByUser: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );

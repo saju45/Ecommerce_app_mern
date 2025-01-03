@@ -10,6 +10,7 @@ import EditBlog from "./components/admin/edit blog/EditBlog";
 import EditProduct from "./components/admin/edit product/EditProduct";
 import Orders from "./components/admin/orders/Orders";
 import Products from "./components/admin/products/Products";
+import Favourites from "./components/profile/Favourites";
 import AdminProtectedRoute from "./components/protectedRoute/AdminProtectedRoute";
 import ProtectedRoute from "./components/protectedRoute/ProtectedRoute";
 import MainLayout from "./layout/MainLayout";
@@ -24,9 +25,12 @@ import Contact from "./pages/contact/Contact";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
 import ProductDescription from "./pages/product details/Description";
+import Profile from "./pages/profile/Page";
 import Shop from "./pages/Shop/Shop";
 import Signup from "./pages/signup/Signup";
 import { login } from "./store/auth";
+
+import ProfileDashboard from "./components/profile/DashBoard";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -56,6 +60,17 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/product/:id" element={<ProductDescription />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ProfileDashboard />} />
+            <Route path="/profile/favourites" element={<Favourites />} />
+          </Route>
         </Route>
 
         <Route element={<OtherLayout />}>

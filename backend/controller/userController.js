@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../model/userModel.js";
+
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -67,6 +68,83 @@ export const logout = async (req, res) => {
       httpOnly: true,
     });
     res.status(200).json({ message: "User logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getUserInfo = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select({ password: 0 });
+
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ erro: "There was an error in server side" });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ error: " please provide currentPass and new Password " });
+    }
+
+    if (currentPassword === newPassword) {
+      return res
+        .status(400)
+        .json({ error: "New password should not be same as current password" });
+    }
+
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(401).json({ error: "user not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid current password" });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+
+    await user.save();
+
+    res.status(200).json({ message: "Password Update successfully", user });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "There was an error in server side" });
+  }
+};
+
+export const updateProfilePic = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "Please choose picture and try" });
+    }
+
+    const updateUser = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        avatar: req.file.path,
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Profile picture updated successfully",
+      user: updateUser,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

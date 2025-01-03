@@ -35,7 +35,9 @@ const Contact = () => {
 
             <li className="flex items-center py-2.5">
               <FaEnvelope className="mr-5" />
-              <p className="text-sm text-gray-500 m-0">contact@example.com </p>
+              <p className="text-sm text-gray-500 m-0">
+                shanawajsaju@gmail.com{" "}
+              </p>
             </li>
 
             <li className="flex items-center py-2.5">
