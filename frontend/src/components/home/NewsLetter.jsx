@@ -1,4 +1,6 @@
+import { useNavigate } from "react-router-dom";
 const Newsletter = () => {
+  const navigate = useNavigate();
   return (
     <div
       className="flex flex-col md:flex-row justify-between items-center flex-wrap bg-cover bg-no-repeat bg-[#041e42] p-5"
@@ -19,11 +21,14 @@ const Newsletter = () => {
       {/* Newsletter Form */}
       <div className="form flex w-[70%] md:w-[40%]  mt-5 md:mt-0">
         <input
-          type="text"
+          type="email"
           placeholder="Enter your email"
           className="h-[3.125rem] px-5 text-[14px] w-full border border-transparent rounded-l-md outline-none"
         />
-        <button className="bg-[#088178] text-white px-6 h-[3.125rem] whitespace-nowrap rounded-r-md">
+        <button
+          className="bg-[#088178] text-white px-6 h-[3.125rem] whitespace-nowrap rounded-r-md"
+          onClick={() => navigate("/signup")}
+        >
           signup
         </button>
       </div>

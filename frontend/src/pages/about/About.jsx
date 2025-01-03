@@ -10,8 +10,8 @@ const About = () => {
         id="page-header"
         className="bg-[url('/images/about/banner.png')] bg-cover bg-no-repeat w-full h-[45vh] flex justify-center items-center text-center flex-col p-4"
       >
-        <h2 className="text-white text-3xl font-bold">#KnowsUs</h2>
-        <p className="text-white text-lg">Lorem ipsum dolor sit amet.</p>
+        <h2 className="text-white text-3xl font-bold">#Developer</h2>
+        <p className="text-white text-lg">Shanawaj hossain saju.</p>
       </div>
 
       {/* About Head Section */}
@@ -22,27 +22,49 @@ const About = () => {
           className="w-full md:w-1/2 h-auto"
         />
         <div className="md:pl-10">
-          <h1 className="text-4xl font-semibold py-4"> Who we are?</h1>
+          <h1 className="text-4xl font-semibold py-4">
+            {" "}
+            Shanawaj hossain saju
+          </h1>
           <p className="text-gray-600">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore,
-            tempora dolorum? Laudantium cumque in quod ducimus nisi autem
-            blanditiis totam. Corrupti vero nam facilis quas dignissimos soluta
-            quisquam alias distinctio, nesciunt, neque voluptate amet harum?
-            Iure doloremque voluptas dolorem possimus velit eligendi ex beatae
-            mollitia pariatur, incidunt placeat, libero amet. Lorem ipsum dolor
-            sit amet consectetur adipisicing elit. Rerum mollitia ipsa nobis,
-            placeat saepe repellat fuga.
+            Hello, my name is Shanawaj hossain saju, and I’m a full stack
+            developer. With 1 years of experience in web development, I have a
+            strong command over both front-end and back-end technologies,
+            allowing me to build complete and scalable applications. On the
+            front-end side, I specialize in HTML, CSS, tailwindcss, and
+            JavaScript frameworks such as React. I’m passionate about creating
+            intuitive user interfaces that provide an exceptional user
+            experience. I pay great attention to detail, ensuring that the
+            websites or applications I develop are responsive, visually
+            appealing, and accessible across different devices and browsers.
+            Moving to the back end, I’m proficient in server-side language
+            Node.js. I have extensive experience working with databases such as
+            MySQL and MongoDB, and I can design efficient database structures
+            and write optimized queries. I’m familiar with RESTful APIs and know
+            how to integrate them into applications to enable seamless
+            communication between the front end and back end. Additionally, I
+            have expertise in version control systems like Git. I enjoy staying
+            up to date with the latest trends and technologies in the web
+            development world, as it allows me to continually improve my skills
+            and deliver cutting-edge solutions. Throughout my career, I’ve had
+            the opportunity to work on various projects, ranging from small
+            startups to large-scale enterprise applications. I thrive in dynamic
+            environments where I can tackle challenges, collaborate with
+            cross-functional teams, and deliver high-quality solutions that meet
+            both user requirements and business objectives. I’m excited to be
+            part of a team where I can contribute my full stack development
+            skills and help create innovative and impactful applications. Thank
+            you for considering me, and I look forward to discussing how I can
+            contribute to your organisation
           </p>
           <marquee
             bgColor="#ccc"
             loop="-1"
             scrollamount="5"
             widt="100%"
-            className="mt-3"
+            className="mt-3 text-white bg-black"
           >
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deserunt,
-            repellendus. Porro saepe animi earum deleniti, magni pariatur
-            sapiente enim dicta.
+            mern stack web and android developer
           </marquee>
         </div>
       </div>
