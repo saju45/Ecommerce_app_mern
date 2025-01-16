@@ -1,81 +1,61 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import NewsLetter from "../../components/home/NewsLetter";
 import ProductCard from "../../components/product/ProductCard";
+import Loading from "../../components/ui/Loading";
+import ProductError from "../../components/ui/ProductError";
+import ProductNotFound from "../../components/ui/ProductNotFound";
+import { useAddToCartMutation } from "../../features/cart/cartApi";
+import {
+  useGetProductByCategoryQuery,
+  useGetSingleProductQuery,
+} from "../../features/products/productApi";
 const ProductDescription = () => {
   const { id } = useParams();
-  const backendLink = useSelector((state) => state.prod.link);
-  const [product, setProduct] = useState({});
-  const [relaredProducts, setRelatedProducts] = useState([]);
   const [imgPosition, setImgPosition] = useState(0);
   const [quantity, setQuantity] = useState(1);
 
+  const {
+    data: product,
+    isLoading,
+    isError,
+    error,
+  } = useGetSingleProductQuery(id);
+  const [addToCart] = useAddToCartMutation();
+
+  const { data: relaredProducts } = useGetProductByCategoryQuery(
+    product?.category
+  );
+
   const handleAddToCart = async () => {
     try {
-      const response = await axios.put(
-        `${backendLink}/cart/add-to-cart`,
-        {
-          productid: id,
-          quantity,
-          price: product?.price,
-          name: product?.name,
-          image: product?.images[0],
-        },
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await addToCart({
+        productid: id,
+        quantity,
+        price: product?.price,
+        name: product?.name,
+        image: product?.images[0],
+      });
 
-      console.log(response);
       toast.success(response.data.message);
     } catch (error) {
       console.log(error);
     }
   };
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get(`${backendLink}/products/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        setProduct(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchProduct();
-  }, [backendLink, id]);
+  // decide what to render
+  let content = null;
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get(
-          `${backendLink}/products/fetchProductByCategory/${product?.category}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        setRelatedProducts(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchProduct();
-  }, [backendLink, id, product]);
-
-  return (
-    <div className="container mx-auto p-6 pt-32">
+  if (isLoading) {
+    content = <Loading />;
+  } else if (!isLoading && isError) {
+    content = <ProductError error={error} />;
+  } else if (!isLoading && !isError && !product) {
+    content = <ProductNotFound />;
+  } else if (!isLoading && !isError && product) {
+    content = (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Section: Product Images */}
         <div>
           <img
             src={product?.images && product?.images[imgPosition]}
@@ -95,7 +75,7 @@ const ProductDescription = () => {
           </div>
         </div>
 
-        {/* Right Section: Product Details */}
+        {/*  Product Details */}
         <div className=" mt-4">
           <p className="text-sm text-gray-500 mb-4">{product?.brand}</p>
 
@@ -163,7 +143,12 @@ const ProductDescription = () => {
           </div>
         </div>
       </div>
+    );
+  }
 
+  return (
+    <div className="container mx-auto p-6 pt-32">
+      {content}
       <div className="bg-white py-12">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800">Related Products</h2>
@@ -171,7 +156,7 @@ const ProductDescription = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
-          {relaredProducts.map((product) => (
+          {relaredProducts?.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

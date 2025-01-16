@@ -1,14 +1,15 @@
-import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
+import { useRegisterMutation } from "../../features/auth/authApi";
 const Signup = () => {
   const [userInfo, setUserInfo] = useState({
     name: "",
     email: "",
     password: "",
   });
+
+  const [register, { data, isSuccess }] = useRegisterMutation();
   const navigate = useNavigate();
   const handleChange = (e) => {
     setUserInfo({ ...userInfo, [e.target.id]: e.target.value });
@@ -16,34 +17,20 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(
-        "http://localhost:1000/users/signup",
-        {
-          name: userInfo.name,
-          email: userInfo.email,
-          password: userInfo.password,
-        },
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      toast.success(response.data.message);
-      setUserInfo({
-        name: "",
-        email: "",
-        password: "",
-      });
-      navigate("/login");
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error(error.response.data.error);
-    }
+    register({
+      name: userInfo.name,
+      email: userInfo.email,
+      password: userInfo.password,
+    });
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      navigate("/login");
+    }
+  }, [isSuccess, navigate, data]);
+
   return (
     <div className="h-screen flex items-center justify-center">
       <div className=" w-[80%] md:w-[60%] lg:w-[40%] p-12 shadow-2xl rounded flex flex-col items-center justify-center">

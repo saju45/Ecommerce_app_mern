@@ -1,43 +1,34 @@
-import axios from "axios";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { login } from "../../store/auth";
+import { useAdminLoginFnMutation } from "../../features/auth/authApi";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const backendLink = useSelector((state) => state.prod.link);
+  const [adminLoginFn, { data, isSuccess, isError, error }] =
+    useAdminLoginFnMutation();
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  console.log(backendLink);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post(
-        `${backendLink}/admin/login`,
-        {
-          email,
-          password,
-        },
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      dispatch(login());
-      toast.success(response.data.message);
-      navigate("/admin-dashboard");
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response.data.error);
-    }
+    adminLoginFn({
+      email,
+      password,
+    });
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success(data.message);
+      navigate("/admin-dashboard");
+    }
+
+    if (isError) {
+      toast.error(error.data.error);
+    }
+  }, [isSuccess, data, navigate, isError, error]);
 
   return (
     <div className="h-screen flex items-center justify-center">

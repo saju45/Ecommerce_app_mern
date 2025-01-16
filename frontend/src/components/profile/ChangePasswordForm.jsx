@@ -1,9 +1,7 @@
-import axios from "axios";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { logout } from "../../store/auth";
+import { useChangePasswordMutation } from "../../features/auth/authApi";
 const ChangePasswordForm = () => {
   const [password, setPassword] = useState({
     currentPassword: "",
@@ -11,8 +9,7 @@ const ChangePasswordForm = () => {
     confirmNewPassword: "",
   });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const backendLink = useSelector((state) => state.prod.link);
+  const [changePassword] = useChangePasswordMutation();
 
   const handleChange = (e) => {
     setPassword({ ...password, [e.target.name]: e.target.value });
@@ -21,18 +18,9 @@ const ChangePasswordForm = () => {
     e.preventDefault();
     try {
       if (password.newPassword === password.confirmNewPassword) {
-        const response = await axios.put(
-          `${backendLink}/users/changePassword`,
-          password,
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        const { data: response } = await changePassword(password);
 
         toast.success(response.data.message);
-        dispatch(logout());
-        localStorage.clear();
         navigate("/login");
       } else {
         toast.error("Passwords do not match");

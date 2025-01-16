@@ -1,9 +1,9 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { logout } from "../../store/auth";
+import { useLogoutMutation } from "../../features/auth/authApi";
+import { useGetCartDataQuery } from "../../features/cart/cartApi";
 
 const Navbar = () => {
   const [cartData, setCartData] = useState([]);
@@ -16,25 +16,18 @@ const Navbar = () => {
     { name: "Contact", to: "/contact" },
   ];
 
+  const { data: cartDataQuery, isSuccess } = useGetCartDataQuery();
+  const [logout] = useLogoutMutation();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const backendLink = useSelector((state) => state.prod.link);
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(
-        `${backendLink}/users/logout`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await logout();
 
       localStorage.clear();
       toast.success(response.data.message);
-      dispatch(logout());
       navigate("/login");
     } catch (error) {
       console.log(error);
@@ -47,20 +40,11 @@ const Navbar = () => {
   }, 0);
 
   useEffect(() => {
-    const fetchCartData = async () => {
-      try {
-        const response = await axios.get(`${backendLink}/cart/getCartData`, {
-          withCredentials: true,
-        });
+    if (isSuccess && cartDataQuery) {
+      setCartData(cartDataQuery?.items);
+    }
+  }, [isSuccess, cartDataQuery]);
 
-        setCartData(response.data.items);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchCartData();
-  }, [backendLink]);
   return (
     <div className="navbar  bg-[#E3E6F3] px-0  md:px-10 border-b border-gray-300 z-50 fixed ">
       <div className="flex-1" onClick={() => navigate("/")}>

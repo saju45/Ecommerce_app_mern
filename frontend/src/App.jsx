@@ -33,11 +33,11 @@ import { login } from "./store/auth";
 import ProfileDashboard from "./components/profile/DashBoard";
 
 function App() {
-  const token = localStorage.getItem("token");
+  const auth = localStorage.getItem("auth");
 
   const dispatch = useDispatch();
 
-  if (token) {
+  if (auth) {
     dispatch(login());
   }
 

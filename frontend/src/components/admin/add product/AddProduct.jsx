@@ -1,8 +1,8 @@
-import axios from "axios";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import { useAddProductMutation } from "../../../features/products/productApi";
 const AddProductPage = () => {
   const [brand, setBrand] = useState("");
   const [size, setSize] = useState("");
@@ -15,21 +15,23 @@ const AddProductPage = () => {
   const [images, setImages] = useState([]);
   const [imagesURLS, setImagesURLS] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const backendLink = useSelector((state) => state.prod.link);
+  const [addProduct] = useAddProductMutation();
 
   const handleImageChange = (event) => {
     const files = Array.from(event.target.files);
 
     setImages([...images, ...files]);
     const newImages = files.map((file) => URL.createObjectURL(file));
-    setImagesURLS([...imagesURLS, newImages]);
+    setImagesURLS([...imagesURLS, ...newImages]);
   };
 
   //reset from
   const reset = () => {
     setBrand("");
     setProductName("");
+    setSize("");
     setPrice("");
     setRating("");
     setCategory("");
@@ -48,6 +50,7 @@ const AddProductPage = () => {
     e.preventDefault();
     //split sizez value by coma
     const sizesArr = size.split(",").map((s) => s.trim());
+    console.log("sizeArr : ", sizesArr);
 
     try {
       setLoading(true);
@@ -62,23 +65,16 @@ const AddProductPage = () => {
       formData.append("description", description);
       images.forEach((image) => formData.append("images", image));
 
-      console.log(formData);
-
-      const config = {
-        withCredentials: true,
-        headers: { "Content-Type": "multipart/form-data" },
-      };
-      const respnse = await axios.post(
-        `${backendLink}/products/addProduct`,
-        formData,
-        config
-      );
-      setLoading(false);
-      toast.success(respnse.data.message);
+      // // make request to backend server use rtk query
+      const response = await addProduct(formData).unwrap();
+      console.log("response : ", response);
+      toast.success("Product added successfully!");
+      navigate("/admin-dashboard/products");
       reset();
+      setLoading(false);
     } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.error);
+      console.log("error : ", error);
+      toast.error("Failed to add product. Please try again!");
       setLoading(false);
     }
   };

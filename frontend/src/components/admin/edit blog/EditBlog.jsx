@@ -1,16 +1,20 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+
+import {
+  useGetSingleBlogQuery,
+  useUpdateBlogMutation,
+} from "../../../features/blog/blogApi";
 const EditBlog = () => {
   const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-
   const { id } = useParams();
-  const backendLink = useSelector((state) => state.prod.link);
+  const { data, isSuccess } = useGetSingleBlogQuery(id);
+
+  const [updateBlog] = useUpdateBlogMutation();
 
   const navigate = useNavigate();
   const handleSubmit = async (event) => {
@@ -22,13 +26,10 @@ const EditBlog = () => {
       formdata.append("description", description);
       formdata.append("image", image);
 
-      const response = await axios.put(
-        `${backendLink}/blog//updateBlog/${id}`,
-        formdata,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await updateBlog({
+        id,
+        data: { title, description, image },
+      });
 
       setLoading(false);
       toast.success(response.data.message);
@@ -44,25 +45,11 @@ const EditBlog = () => {
   };
 
   useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        const response = await axios.get(
-          `${backendLink}/blog/fetchSingleBlog/${id}`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        setTitle(response.data.blog.title);
-        setDescription(response.data.blog.description);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchBlog();
-  }, [backendLink, id]);
+    if (isSuccess) {
+      setTitle(data?.blog?.title);
+      setDescription(data?.blog?.description);
+    }
+  }, [isSuccess, data]);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">

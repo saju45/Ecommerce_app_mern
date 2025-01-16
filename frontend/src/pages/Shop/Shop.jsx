@@ -1,25 +1,16 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import Newsletter from "../../components/home/NewsLetter";
 import ProductCard from "../../components/product/ProductCard";
+import { useGetAllProductsQuery } from "../../features/products/productApi";
 const Shop = () => {
   const [products, setProducts] = useState([]);
-  const backendLick = useSelector((state) => state.prod.link);
+  const { data, isSuccess } = useGetAllProductsQuery();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          `${backendLick}/products/fetchAllProduct`
-        );
-        setProducts(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchProducts();
-  }, [backendLick]);
+    if (isSuccess && data) {
+      setProducts(data);
+    }
+  }, [isSuccess, data]);
   return (
     <div>
       {/* Page Header Section */}

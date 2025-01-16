@@ -1,30 +1,16 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useGetFavouriteBlogsQuery } from "../../features/blog/blogApi";
 import BlogCard from "../blog/BlogCard";
 const Favourites = () => {
   const [blogs, setBlogs] = useState([]);
 
-  const backendLink = useSelector((state) => state.prod.link);
+  const { data: favouriteBlogs, isSuccess } = useGetFavouriteBlogsQuery();
 
   useEffect(() => {
-    const fetchFavourites = async () => {
-      try {
-        const response = await axios.get(
-          `${backendLink}/blog/getAllFavourtie`,
-          {
-            withCredentials: true,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        setBlogs(response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchFavourites();
-  }, [backendLink]);
+    if (isSuccess) {
+      setBlogs(favouriteBlogs);
+    }
+  }, [isSuccess, favouriteBlogs]);
 
   return (
     <div className="mb-4 py-4">

@@ -19,12 +19,19 @@ app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//cors middleware
 app.use(
   cors({
     origin: "http://localhost:5173",
     credentials: true,
   })
 );
+
+app.use((err, req, res, next) => {
+  console.error("Server Error:", err.message);
+  res.status(500).json({ error: "An unexpected error occurred." });
+});
 
 // Routes
 app.get("/", (req, res) => {

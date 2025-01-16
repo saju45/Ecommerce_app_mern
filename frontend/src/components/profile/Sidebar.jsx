@@ -1,28 +1,19 @@
-import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { logout } from "../../store/auth";
+import { useLogoutMutation } from "../../features/auth/authApi";
+
 const Sidebar = () => {
   const sidebarLinks = [
     { name: "Dashboard", to: "/profile" },
     { name: "Favourites", to: "/profile/favourites" },
     // Add more links here
   ];
-  const backendLink = useSelector((state) => state.prod.link);
-  const dispatch = useDispatch();
+  const [logout] = useLogoutMutation();
+  const navigate = useNavigate();
   const handleLogout = async () => {
     try {
-      const response = await axios.post(
-        `${backendLink}/users/logout`,
-        {},
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      dispatch(logout());
-      localStorage.clear();
+      const response = await logout();
+      navigate("/login");
       toast.success(response.data.message);
     } catch (error) {
       toast.error("Failed to logout");

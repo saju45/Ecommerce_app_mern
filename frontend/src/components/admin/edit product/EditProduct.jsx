@@ -1,8 +1,10 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  useGetSingleProductQuery,
+  useUpdateProductMutation,
+} from "../../../features/products/productApi";
 const EditProduct = () => {
   const [product, setProduct] = useState({
     brand: "",
@@ -15,29 +17,33 @@ const EditProduct = () => {
     description: "",
     images: [],
   });
+  const [updateProduct] = useUpdateProductMutation();
 
   const [size, setSize] = useState("");
 
-  console.log(product);
   const [loading, setLoading] = useState(false);
 
   const { id } = useParams();
+  const { data, isSuccess } = useGetSingleProductQuery(id);
 
-  const backendLink = useSelector((state) => state.prod.link);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const productData = {
-      productName,
-      price,
-      category,
-      stock,
-      description,
-      images,
-    };
-    console.log(productData);
-    alert("Product added successfully!");
-    // Add API integration here to submit the product
+
+    try {
+      setLoading(true);
+      const response = await updateProduct({ id, data: product }).unwrap();
+
+      console.log(response);
+      toast.success(response.message);
+      navigate(`/admin-dashboard/products`);
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+      console.log(error);
+    }
   };
 
   const handleChangeSize = (e) => {
@@ -54,21 +60,11 @@ const EditProduct = () => {
   };
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get(`${backendLink}/products/${id}`, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        setProduct(response.data);
-        setSize(response.data.sizes.join(","));
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchProduct();
-  }, [backendLink, id]);
+    if (isSuccess && data) {
+      setProduct(data);
+      setSize(data.sizes.join(","));
+    }
+  }, [isSuccess, data]);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">

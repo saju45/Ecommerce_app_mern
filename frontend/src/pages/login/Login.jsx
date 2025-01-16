@@ -1,47 +1,26 @@
-import axios from "axios";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { login } from "../../store/auth";
-
+import { useLoginMutation } from "../../features/auth/authApi";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [login, { data, isSuccess }] = useLoginMutation();
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    try {
-      const response = await axios.post(
-        "http://localhost:1000/users/login",
-        {
-          email,
-          password,
-        },
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      console.log(response);
-
-      toast.success(response.data.message);
-      localStorage.setItem("token", response.data.token);
-      dispatch(login());
-
-      navigate("/");
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.error);
-    }
+    login({ email, password });
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/");
+      toast.success(data.message);
+    }
+  }, [isSuccess, navigate, data]);
 
   return (
     <div className="h-screen flex items-center justify-center">

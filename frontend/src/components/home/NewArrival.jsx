@@ -1,24 +1,36 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+/* eslint-disable no-unused-vars */
+import { useGetNewArrivalsQuery } from "../../features/products/productApi";
 import ProductCard from "../product/ProductCard";
+import Loading from "../ui/Loading";
+import ProductError from "../ui/ProductError";
+import ProductNotFound from "../ui/ProductNotFound";
 const NewArrivals = () => {
-  const [products, setProducts] = useState([]);
-  const backendLick = useSelector((state) => state.prod.link);
+  const {
+    data: products,
+    isLoading,
+    isError,
+    error,
+  } = useGetNewArrivalsQuery();
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          `${backendLick}/products/fetchNewArrivals`
-        );
-        setProducts(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchProducts();
-  }, [backendLick]);
+  //decide what to render
+  let content = null;
+
+  if (isLoading) {
+    content = <Loading />;
+  } else if (!isLoading && isError) {
+    content = <ProductError error={error} />;
+  } else if (!isLoading && !isError && products?.length === 0) {
+    content = <ProductNotFound />;
+  } else if (!isLoading && !isError && products?.length > 0) {
+    content = (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-10 md:px-20">
+        {products?.map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white py-12">
       <div className="text-center mb-8">

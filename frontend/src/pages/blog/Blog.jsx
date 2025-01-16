@@ -1,26 +1,16 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import BlogCard from "../../components/blog/BlogCard";
 import Newsletter from "../../components/home/NewsLetter";
+import { useGetAllBlogsQuery } from "../../features/blog/blogApi";
 const Blog = () => {
   const [blogs, setBlogs] = useState([]);
-
-  const backendLink = useSelector((state) => state.prod.link);
+  const { data, isSuccess } = useGetAllBlogsQuery();
 
   useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const response = await axios.get(`${backendLink}/blog/fetchAllBlogs`);
-        setBlogs(response.data);
-        console.log(response);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchBlogs();
-  }, [backendLink]);
+    if (isSuccess && data) {
+      setBlogs(data);
+    }
+  }, [isSuccess, data]);
 
   return (
     <div>

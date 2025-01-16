@@ -1,31 +1,24 @@
 /* eslint-disable react/prop-types */
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaTimesCircle } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import {
+  useDeleteFromCartMutation,
+  useUpdateCartQuantityMutation,
+} from "../../features/cart/cartApi";
 import useDebounce from "../../utils/debounce";
 
 const CartCard = ({ item }) => {
-  const backendLink = useSelector((state) => state.prod.link);
   const [quantity, setQuantity] = useState(item?.quantity);
   const subTotal = item?.price * item?.quantity;
+  const [updateCartQuantity] = useUpdateCartQuantityMutation();
+  const [deleteFromCart] = useDeleteFromCartMutation();
 
   const handleRemovedCartData = async (productid) => {
     try {
-      const response = await axios.put(
-        `${backendLink}/cart/removeCartData`,
-        {},
-        {
-          withCredentials: true,
-          headers: {
-            productid,
-          },
-        }
-      );
+      const response = await deleteFromCart(productid);
 
       toast.success(response.data.message);
-      window.location.reload();
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.message);
@@ -41,27 +34,21 @@ const CartCard = ({ item }) => {
   useEffect(() => {
     const updateQuantity = async () => {
       try {
-        const response = await axios.put(
-          `${backendLink}/cart/updateCart`,
-          {
-            productid: item.productId,
-            quantity: debouncedValue,
-          },
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await updateCartQuantity({
+          productid: item.productId,
+          quantity: debouncedValue,
+        });
+
         toast.success(response.data.message);
-        window.location.reload();
       } catch (error) {
         console.log(error);
         toast.error(error.response.data.error);
       }
     };
-    if (item.quantity !== debouncedValue) {
+    if (item.quantity != debouncedValue) {
       updateQuantity();
     }
-  }, [debouncedValue, backendLink, item]);
+  }, [debouncedValue, item, updateCartQuantity]);
 
   return (
     <tr>

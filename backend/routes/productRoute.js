@@ -26,7 +26,7 @@ router.post(
 );
 
 router.put(
-  "/updateProduct",
+  "/updateProduct/:id",
   authMiddlware.verify,
   authMiddlware.authorizeRole("admin"),
   updateProduct

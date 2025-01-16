@@ -1,26 +1,25 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-
+import {
+  useAddToFavouriteMutation,
+  useGetSingleBlogQuery,
+  useRemovedFromFavouriteMutation,
+} from "../../features/blog/blogApi";
 const BlogDescription = () => {
   const [blog, setBlog] = useState({});
   const [favourites, setFavourites] = useState(false);
 
   const { id } = useParams();
-
-  const backendLink = useSelector((state) => state.prod.link);
+  const { data: blogData, isSuccess } = useGetSingleBlogQuery(id);
+  const [addToFavourite] = useAddToFavouriteMutation();
+  const [removedFromFavourite] = useRemovedFromFavouriteMutation();
 
   const handleFavourite = async () => {
     if (favourites) {
       try {
-        const response = await axios.put(
-          `${backendLink}/blog/removeFromFavourite/${id}`,
-          {},
-          { withCredentials: true }
-        );
+        const response = await removedFromFavourite(id);
 
         setFavourites(false);
         toast.success(response.data.message);
@@ -30,11 +29,7 @@ const BlogDescription = () => {
       }
     } else {
       try {
-        const response = await axios.put(
-          `${backendLink}/blog/addToFavourite/${id}`,
-          {},
-          { withCredentials: true }
-        );
+        const response = await addToFavourite(id);
 
         setFavourites(true);
         toast.success(response.data.message);
@@ -46,34 +41,21 @@ const BlogDescription = () => {
   };
 
   useEffect(() => {
-    const fetchBlog = async () => {
-      try {
-        const response = await axios.get(
-          `${backendLink}/blog//fetchSingleBlog/${id}`,
-          {
-            withCredentials: true,
-          }
-        );
-        setBlog(response.data.blog);
+    if (isSuccess) {
+      setBlog(blogData.blog);
+      console.log(blogData);
 
-        console.log(response);
+      const isFavourite = blogData.blog.favouriteBlogByUser.find(
+        (id) => id.toString() === id
+      );
 
-        const isFavourite = response.data.blog.favouriteBlogByUser.find(
-          (id) => id.toString() === id
-        );
-
-        if (isFavourite) {
-          setFavourites(true);
-        } else {
-          setFavourites(false);
-        }
-      } catch (error) {
-        console.error(error);
+      if (isFavourite) {
+        setFavourites(true);
+      } else {
+        setFavourites(false);
       }
-    };
-
-    fetchBlog();
-  }, [backendLink, id]);
+    }
+  }, [isSuccess, blogData]);
 
   return (
     <div className="pt-20 px-10 md:px-20">

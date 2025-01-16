@@ -72,17 +72,11 @@ export const getProductByCategory = async (req, res) => {
 // Add new product
 export const addProduct = async (req, res) => {
   try {
-    const {
-      name,
-      price,
-      category,
-      stock,
-      sizes,
-      brand,
-      rating,
-      description,
-      images,
-    } = req.body;
+    const { name, price, category, stock, brand, rating, description } =
+      req.body;
+    const sizes = JSON.parse(req.body.sizes);
+
+    console.log("request body : ", req.body);
 
     if (
       !name ||
@@ -97,6 +91,8 @@ export const addProduct = async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
+    console.log("sizes : ", sizes);
+
     if (!req.files) {
       return res.status(400).json({ error: "Please upload a product image" });
     }
@@ -105,7 +101,7 @@ export const addProduct = async (req, res) => {
       name,
       price,
       category,
-      sizes: JSON.parse(sizes),
+      sizes,
       stock,
       brand,
       rating,
@@ -118,7 +114,10 @@ export const addProduct = async (req, res) => {
       .status(201)
       .json({ message: "product add successfully", product: newProduct });
   } catch (error) {
-    console.error("Error adding product", error);
+    console.log("errror : ");
+
+    console.log(error);
+    console.log("Error adding product", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -128,9 +127,9 @@ export const updateProduct = async (req, res) => {
     const { name, price, category, stock, sizes, brand, rating, description } =
       req.body;
 
-    const { productid } = req.headers;
+    const { id } = req.params;
 
-    if (!productid) {
+    if (!id) {
       return res.status(400).json({ error: "Please provide productId " });
     }
 
@@ -147,7 +146,7 @@ export const updateProduct = async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const data = await Product.findByIdAndUpdate(productid, req.body, {
+    const data = await Product.findByIdAndUpdate(id, req.body, {
       new: true,
     });
 

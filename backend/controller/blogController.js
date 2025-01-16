@@ -53,8 +53,6 @@ export const updateBlog = async (req, res) => {
   try {
     const { title, description } = req.body;
 
-    console.log(title, description);
-
     if (!title || !description) {
       return res
         .status(400)

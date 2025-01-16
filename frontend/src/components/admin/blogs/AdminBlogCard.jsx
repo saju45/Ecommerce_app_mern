@@ -1,21 +1,14 @@
 /* eslint-disable react/prop-types */
-import axios from "axios";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useDeleteBlogMutation } from "../../../features/blog/blogApi";
 
 const AdminBlogCard = ({ blog }) => {
-  const backendLink = useSelector((state) => state.prod.link);
+  const [deleteBlog, { loading }] = useDeleteBlogMutation();
   const handleDelete = async (blogId) => {
     try {
-      const response = await axios.delete(
-        `${backendLink}/blog/deleteBlog/${blogId}`,
-        { withCredentials: true }
-      );
+      const response = await deleteBlog(blogId);
       toast.success(response.data.message);
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.error);
@@ -34,12 +27,18 @@ const AdminBlogCard = ({ blog }) => {
       <h4 className="text-lg font-semibold text-gray-800">{blog?.title}</h4>
 
       <div className="flex justify-between mt-4">
-        <Link
-          to={`/admin-dashboard/editBlog/${blog?._id}`}
-          className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 "
-        >
-          Edit
-        </Link>
+        {loading ? (
+          <Link className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 ">
+            deleting ...
+          </Link>
+        ) : (
+          <Link
+            to={`/admin-dashboard/editBlog/${blog?._id}`}
+            className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 "
+          >
+            Edit
+          </Link>
+        )}
         <button
           className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700"
           onClick={() => handleDelete(blog?._id)}

@@ -1,15 +1,14 @@
-import axios from "axios";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { useAddBlogMutation } from "../../../features/blog/blogApi";
+
 const AddBlog = () => {
   const [loading, setLoading] = useState(false);
 
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-
-  const backendLink = useSelector((state) => state.prod.link);
+  const [addBlog] = useAddBlogMutation();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -20,13 +19,7 @@ const AddBlog = () => {
       formdata.append("description", description);
       formdata.append("image", image);
 
-      const response = await axios.post(
-        `${backendLink}/blog/addBlog`,
-        formdata,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await addBlog(formdata);
 
       setLoading(false);
       toast.success(response.data.message);

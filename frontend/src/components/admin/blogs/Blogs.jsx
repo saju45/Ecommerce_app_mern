@@ -1,24 +1,33 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useGetAllBlogsQuery } from "../../../features/blog/blogApi";
+import Loading from "../../ui/Loading";
+import ProductNotFound from "../../ui/ProductNotFound";
 import AdminBlogCard from "./AdminBlogCard";
 const Blogs = () => {
-  const [blogs, setBlogs] = useState([]);
-  const backendLick = useSelector((state) => state.prod.link);
+  const { data: blogs, isLoading, isError, error } = useGetAllBlogsQuery();
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const response = await axios.get(`${backendLick}/blog/fetchAllBlogs`);
-        console.log(response);
+  //decide what to render
+  let content = null;
 
-        setBlogs(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchBlogs();
-  }, [backendLick]);
+  if (isLoading) {
+    content = <Loading />;
+  } else if (!isLoading && isError) {
+    content = (
+      <div className="flex items-center justify-center text-2xl py-10 font-semibold text-black">
+        {error}
+      </div>
+    );
+  } else if (!isLoading && !isError && blogs?.length === 0) {
+    content = <ProductNotFound />;
+  } else if (!isLoading && !isError && blogs?.length > 0) {
+    content = (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 px-10 md:px-20">
+        {blogs?.map((product) => (
+          <AdminBlogCard key={product._id} blog={product} />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white py-12">
       <div className="text-center mb-8">
@@ -26,11 +35,7 @@ const Blogs = () => {
         <p className="text-gray-600">you can edit or delete</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6 px-10 md:px-20">
-        {blogs?.map((product) => (
-          <AdminBlogCard key={product._id} blog={product} />
-        ))}
-      </div>
+      {content}
     </div>
   );
 };

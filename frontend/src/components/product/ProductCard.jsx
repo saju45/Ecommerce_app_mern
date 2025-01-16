@@ -2,31 +2,23 @@
 
 import { RiStarFill, RiStarHalfLine, RiStarLine } from "react-icons/ri";
 
-import axios from "axios";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAddToCartMutation } from "../../features/cart/cartApi";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
 
-  const backendLink = useSelector((state) => state.prod.link);
+  const [addToCart] = useAddToCartMutation();
   const handleAddToCart = async () => {
     try {
-      const response = await axios.put(
-        `${backendLink}/cart/add-to-cart`,
-        {
-          productid: product?._id,
-          quantity: 1,
-          price: product?.price,
-          name: product?.name,
-          image: product?.images[0],
-        },
-        {
-          withCredentials: true,
-        }
-      );
-
+      const response = await addToCart({
+        productid: product?._id,
+        quantity: 1,
+        price: product?.price,
+        name: product?.name,
+        image: product?.images[0],
+      });
       toast.success(response.data.message);
     } catch (error) {
       console.log(error);

@@ -1,25 +1,16 @@
 /* eslint-disable react/prop-types */
-import axios from "axios";
-import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useDeleteProductMutation } from "../../../features/products/productApi.js";
 
 const AdminProductCard = ({ product }) => {
-  const backendLink = useSelector((state) => state.prod.link);
+  const [deleteProduct] = useDeleteProductMutation();
   const handleDelete = async () => {
     try {
-      const response = await axios.delete(
-        `${backendLink}/products/${product?._id}`,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await deleteProduct(product?._id);
+
       console.log(response);
       toast.success(response.data.message);
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error) {
       console.log(error);
       toast.error(error.response.data.error);

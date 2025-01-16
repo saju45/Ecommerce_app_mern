@@ -1,13 +1,17 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaUser } from "react-icons/fa";
-import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import {
+  useGetUserInfoQuery,
+  useUpdateProfileImageMutation,
+} from "../../features/user/userApi";
 import ChangePasswordForm from "./ChangePasswordForm";
 const DashBoard = () => {
   const [user, setUser] = useState({});
   const [changeAvater, setChangeAvater] = useState(null);
-  const backendLink = useSelector((state) => state.prod.link);
+  const { data: userInfo, isSuccess } = useGetUserInfoQuery();
+  const [updateProfileImage, { isLoading: isUpdating }] =
+    useUpdateProfileImageMutation();
 
   const changeImage = (e) => {
     setChangeAvater(e.target.files[0]);
@@ -18,13 +22,8 @@ const DashBoard = () => {
     formData.append("image", changeAvater);
 
     try {
-      const response = await axios.put(
-        `${backendLink}/users/updateProfilePic`,
-        formData,
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await updateProfileImage(formData);
+
       setUser({ ...user, avatar: response.data.user.avatar });
       toast.success(response.data.message);
 
@@ -36,20 +35,10 @@ const DashBoard = () => {
   };
 
   useEffect(() => {
-    const fechUserInfo = async () => {
-      try {
-        const response = await axios.get(`${backendLink}/users/getUserInfo`, {
-          withCredentials: true,
-        });
-
-        setUser(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fechUserInfo();
-  }, [backendLink]);
+    if (isSuccess && userInfo) {
+      setUser(userInfo);
+    }
+  }, [isSuccess, userInfo]);
 
   return (
     <div className="flex flex-col">
@@ -83,12 +72,21 @@ const DashBoard = () => {
               className="mb-4 bg-zinc-900 text-white hidden"
               onChange={changeImage}
             />
-            <button
-              className="bg-blue-700 hover:bg-blue-600 transition-all duration-200 text-center px-4 py-2 text-white rounded"
-              onClick={uploadProfilePic}
-            >
-              Change Avatar
-            </button>
+            {isUpdating ? (
+              <button
+                disabled
+                className="bg-blue-700 hover:bg-blue-600 transition-all duration-200 text-center px-4 py-2 text-white rounded"
+              >
+                Uploading...
+              </button>
+            ) : (
+              <button
+                className="bg-blue-700 hover:bg-blue-600 transition-all duration-200 text-center px-4 py-2 text-white rounded"
+                onClick={uploadProfilePic}
+              >
+                Change Avatar
+              </button>
+            )}
           </div>
         </div>
         <div>

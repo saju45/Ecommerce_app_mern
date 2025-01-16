@@ -1,31 +1,19 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import CartCard from "../../components/cart/CartCard";
+import { useGetCartDataQuery } from "../../features/cart/cartApi";
 const Cart = () => {
   const [cartData, setCartData] = useState([]);
-
-  const backendLink = useSelector((state) => state.prod.link);
+  const { data: cartItems, isSuccess } = useGetCartDataQuery();
 
   const subTotal = cartData?.reduce((amout, item) => {
     return amout + item.quantity * item.price;
   }, 0);
 
   useEffect(() => {
-    const fetchCartData = async () => {
-      try {
-        const response = await axios.get(`${backendLink}/cart/getCartData`, {
-          withCredentials: true,
-        });
-
-        setCartData(response.data.items);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchCartData();
-  }, [backendLink]);
+    if (isSuccess) {
+      setCartData(cartItems?.items);
+    }
+  }, [isSuccess, cartItems]);
 
   return (
     <div>
