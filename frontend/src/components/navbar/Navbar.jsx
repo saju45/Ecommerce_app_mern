@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useLogoutMutation } from "../../features/auth/authApi";
 import { useGetCartDataQuery } from "../../features/cart/cartApi";
+import SearchBar from "./Searchbar";
 
 const Navbar = () => {
   const [cartData, setCartData] = useState([]);
@@ -51,6 +52,7 @@ const Navbar = () => {
         <img src="/images/logo.png" alt="logo" />
       </div>
       <div className=" md:flex-none">
+        <SearchBar />
         <ul className="hidden md:flex gap-4 mr-5">
           {links.map((link, index) => (
             <Link

@@ -56,6 +56,12 @@ const Sidebar = ({ onToggleSidebar, showSidebar }) => {
         >
           Customers
         </Link>
+        <Link
+          to="/admin-dashboard/categories"
+          className="block p-2 rounded-md text-gray-700 hover:bg-gray-200"
+        >
+          Categories
+        </Link>
       </nav>
     </div>
   );

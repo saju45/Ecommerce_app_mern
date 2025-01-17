@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import { useGetAllCategoriesQuery } from "../../../features/categories/categoryApi";
 import { useAddProductMutation } from "../../../features/products/productApi";
 const AddProductPage = () => {
   const [brand, setBrand] = useState("");
@@ -17,6 +18,7 @@ const AddProductPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { data: categories } = useGetAllCategoriesQuery();
   const [addProduct] = useAddProductMutation();
 
   const handleImageChange = (event) => {
@@ -151,15 +153,21 @@ const AddProductPage = () => {
           >
             Category
           </label>
-          <input
-            type="text"
+
+          <select
+            name="category"
             id="category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             className="mt-1 block w-full px-4 py-2 border rounded-md text-gray-700 shadow-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-            placeholder="Enter category"
-            required
-          />
+          >
+            <option value="">Select a Category</option>
+            {categories?.map((category) => (
+              <option key={category._id} value={category.name}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Stock */}

@@ -8,7 +8,7 @@ const ProductList = () => {
     isLoading,
     isError,
     error,
-  } = useGetAllProductsQuery();
+  } = useGetAllProductsQuery("");
 
   //decide what to render
   let content = null;

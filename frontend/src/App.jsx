@@ -13,6 +13,7 @@ import Products from "./components/admin/products/Products";
 import Favourites from "./components/profile/Favourites";
 import AdminProtectedRoute from "./components/protectedRoute/AdminProtectedRoute";
 import ProtectedRoute from "./components/protectedRoute/ProtectedRoute";
+import { login } from "./features/auth/authSlice.js";
 import MainLayout from "./layout/MainLayout";
 import OtherLayout from "./layout/OtherLayout";
 import About from "./pages/about/About";
@@ -28,8 +29,8 @@ import ProductDescription from "./pages/product details/Description";
 import Profile from "./pages/profile/Page";
 import Shop from "./pages/Shop/Shop";
 import Signup from "./pages/signup/Signup";
-import { login } from "./store/auth";
 
+import Categories from "./components/admin/categories/Categories";
 import ProfileDashboard from "./components/profile/DashBoard";
 
 function App() {
@@ -68,7 +69,14 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<ProfileDashboard />} />
+            <Route
+              index
+              element={
+                <ProtectedRoute>
+                  <ProfileDashboard />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/profile/favourites" element={<Favourites />} />
           </Route>
         </Route>
@@ -92,6 +100,10 @@ function App() {
             <Route path="/admin-dashboard/oreders" element={<Orders />} />
             <Route path="/admin-dashboard/addBlog" element={<AddBlog />} />
             <Route path="/admin-dashboard/customers" element={<Customers />} />
+            <Route
+              path="/admin-dashboard/categories"
+              element={<Categories />}
+            />
             <Route
               path="/admin-dashboard/addProduct"
               element={<AddProductPage />}

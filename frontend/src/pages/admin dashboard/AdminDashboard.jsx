@@ -1,14 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoMdMenu } from "react-icons/io";
 import { Outlet, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/admin/sidebar/Sidebar";
+
+import useDebounce from "../../utils/debounce.js";
 const AdminDashboard = () => {
   const [showSidebar, setShowSideBar] = useState(false);
 
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 500);
+
   const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    setQuery(e.target.value);
+  };
+
   const toggleSidebar = () => {
     setShowSideBar(!showSidebar);
   };
+
+  useEffect(() => {
+    if (debouncedQuery) {
+      navigate(`/admin-dashboard/products?search=${debouncedQuery}`);
+    }
+  }, [debouncedQuery, navigate]);
+
   return (
     <div className="flex h-screen bg-gray-100 relative">
       {/* Sidebar */}
@@ -27,6 +44,8 @@ const AdminDashboard = () => {
             <input
               type="text"
               placeholder="Search..."
+              value={query}
+              onChange={handleSearch}
               className="hidden md:block p-2 rounded-md border border-gray-300"
             />
             <button

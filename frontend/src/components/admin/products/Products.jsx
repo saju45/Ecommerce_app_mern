@@ -1,14 +1,18 @@
+import { useSearchParams } from "react-router-dom";
 import { useGetAllProductsQuery } from "../../../features/products/productApi";
 import Loading from "../../ui/Loading";
 import ProductNotFound from "../../ui/ProductNotFound.jsx";
 import AdminProductCard from "./AdminProductCard";
+
 const Products = () => {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search");
   const {
     data: products,
     isLoading,
     isError,
     error,
-  } = useGetAllProductsQuery();
+  } = useGetAllProductsQuery(searchQuery ? searchQuery : "");
 
   //decide what to render
   let content = null;

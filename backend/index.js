@@ -6,6 +6,7 @@ import connect from "./connection/connection.js";
 import adminRouter from "./routes/adminRoute.js";
 import blogRouter from "./routes/blogRoute.js";
 import cartRouter from "./routes/cartRoute.js";
+import categoryRouter from "./routes/categoryRoute.js";
 import emailRouter from "./routes/emailRouter.js";
 import productRouter from "./routes/productRoute.js";
 import userRouter from "./routes/userRoute.js";
@@ -46,6 +47,7 @@ app.use("/admin", adminRouter);
 app.use("/products", productRouter);
 app.use("/cart", cartRouter);
 app.use("/blog", blogRouter);
+app.use("/categories", categoryRouter);
 app.use("/email", emailRouter);
 
 app.listen(process.env.PORT, () => {

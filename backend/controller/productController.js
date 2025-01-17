@@ -1,8 +1,11 @@
 import Product from "../model/productModel.js";
 
 export const getAllProducts = async (req, res) => {
+  const { search } = req.query;
+
   try {
-    const products = await Product.find({});
+    const query = search ? { name: { $regex: search, $options: "i" } } : {};
+    const products = await Product.find(query);
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
