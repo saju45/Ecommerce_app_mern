@@ -1,11 +1,48 @@
 import Product from "../model/productModel.js";
 
 export const getAllProducts = async (req, res) => {
-  const { search } = req.query;
+  const { search, category, minPrice, maxPrice } = req.query;
+  //pagination
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  const total = await Product.countDocuments();
+  const totalPages = Math.ceil(total / limit);
+  let query = {};
+
+  if (search) query.name = { $regex: search, $options: "i" };
+  if (category) query.category = category;
+
+  if (minPrice || maxPrice) {
+    query.price = {};
+    if (minPrice) query.price.$gte = minPrice;
+    if (maxPrice) query.price.$lte = maxPrice;
+  }
 
   try {
-    const query = search ? { name: { $regex: search, $options: "i" } } : {};
-    const products = await Product.find(query);
+    const products = await Product.find(query)
+      .skip(startIndex)
+      .limit(limit)
+      .sort({ price: 1 });
+    if (!products) {
+      return res.status(404).json({ error: "Products not found" });
+    }
+    res.json({ products, currentPage: page, totalPages });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+//get all product with out pagination
+export const getAllProductsNoPagination = async (req, res) => {
+  try {
+    const products = await Product.find();
+
+    if (!products) {
+      return res.status(404).json({ error: "Products not found" });
+    }
+
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: "Server error" });

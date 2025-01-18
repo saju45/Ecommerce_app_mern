@@ -1,21 +1,38 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+// import { useSearchParams } from "react-router-dom";
 import Newsletter from "../../components/home/NewsLetter";
 import ProductCard from "../../components/product/ProductCard";
 import Sidebar from "../../components/shop/Sidebar";
 import { useGetAllProductsQuery } from "../../features/products/productApi";
 const Shop = () => {
   const [products, setProducts] = useState([]);
-  const [searchParams] = useSearchParams();
-  const searchQuery = searchParams.get("search");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  // const [searchParams] = useSearchParams();
+  // const searchQuery = searchParams.get("search");
+  // const categoryQuery = searchParams.get("category");
+  // const minPrice = searchParams.get("minPrice");
+  // const maxPrice = searchParams.get("maxPrice");
 
-  const { data, isSuccess } = useGetAllProductsQuery(
-    searchQuery ? searchQuery : ""
-  );
+  const filterItems = useSelector((state) => state.filter);
+
+  const { data, isSuccess } = useGetAllProductsQuery({
+    ...filterItems,
+    page: page,
+    limit: 9,
+  });
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
 
   useEffect(() => {
-    if (isSuccess && data) {
-      setProducts(data);
+    if (isSuccess && data?.products) {
+      setProducts(data?.products);
+      setTotalPages(data?.totalPages);
     }
   }, [isSuccess, data]);
 
@@ -47,24 +64,35 @@ const Shop = () => {
             id="pagination"
             className="text-center mb-6 flex flex-row items-center justify-center gap-4"
           >
-            <a
-              href="#"
-              className="no-underline bg-[#088178] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
+            <button
+              className="no-underline bg-[#088178] disabled:bg-[#A0C7C3] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
             >
-              1
-            </a>
-            <a
-              href="#"
-              className="no-underline bg-[#088178] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+              (page) => (
+                <button
+                  key={page}
+                  className={`no-underline bg-[#088178] text-white px-5 py-3 rounded font-semibold inline-flex items-center ${
+                    page === data?.currentPage
+                      ? "border-2 border-white bg-green-500"
+                      : ""
+                  }`}
+                  onClick={() => handlePageChange(page)}
+                >
+                  {page}
+                </button>
+              )
+            )}
+            <button
+              className="no-underline bg-[#088178] disabled:bg-[#A0C7C3] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
             >
-              2
-            </a>
-            <a
-              href="#"
-              className="no-underline bg-[#088178] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
-            >
-              3
-            </a>
+              Next
+            </button>
           </div>
         </div>
       </div>

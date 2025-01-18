@@ -3,6 +3,7 @@ import {
   addProduct,
   deleteProduct,
   getAllProducts,
+  getAllProductsNoPagination,
   getNewArrivalsProducts,
   getProductByCategory,
   getProductById,
@@ -14,6 +15,7 @@ import upload from "../middleware/imageUpload.js";
 const router = express();
 
 router.get("/fetchAllProduct", getAllProducts);
+router.get("/allProducts", getAllProductsNoPagination);
 router.get("/fetchNewArrivals", getNewArrivalsProducts);
 router.get("/:id", getProductById);
 router.get("/fetchProductByCategory/:category", getProductByCategory);

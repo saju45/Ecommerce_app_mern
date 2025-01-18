@@ -1,27 +1,32 @@
 import { useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import {
+  removeSearchTerm,
+  searchTermUpdated,
+} from "../../features/filter/filterSlice";
 import useDebounce from "../../utils/debounce";
 const SearchBar = () => {
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 500);
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const handleSearch = (e) => {
     setQuery(e.target.value);
   };
 
   useEffect(() => {
     if (debouncedQuery) {
-      // make API call to search for products with the debounced query
-      console.log("debounce value : ", debouncedQuery);
+      dispatch(searchTermUpdated(debouncedQuery));
       navigate(`/shop?search=${debouncedQuery}`);
     } else {
+      dispatch(removeSearchTerm());
       if (location.pathname === "/shop") {
         navigate("/shop");
       }
     }
-  }, [debouncedQuery, navigate]);
+  }, [debouncedQuery, navigate, dispatch]);
   return (
     <div className="flex items-center w-full max-w-lg mx-auto mr-5">
       <input

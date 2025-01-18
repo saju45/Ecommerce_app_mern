@@ -1,14 +1,9 @@
-import { useGetAllProductsQuery } from "../../features/products/productApi";
+import { useGetProductsQuery } from "../../features/products/productApi";
 import ProductCard from "../product/ProductCard";
 import Loading from "../ui/Loading";
 import ProductNotFound from "../ui/ProductNotFound";
 const ProductList = () => {
-  const {
-    data: products,
-    isLoading,
-    isError,
-    error,
-  } = useGetAllProductsQuery("");
+  const { data: products, isLoading, isError, error } = useGetProductsQuery();
 
   //decide what to render
   let content = null;

@@ -25,9 +25,25 @@ export const addBlog = async (req, res) => {
 };
 
 export const getAllBlogs = async (req, res) => {
+  //pagination
+  //pagination
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 5;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  const total = await Blog.countDocuments();
+  const totalPages = Math.ceil(total / limit);
   try {
-    const blogs = await Blog.find();
-    res.status(200).json(blogs);
+    const blogs = await Blog.find().skip(startIndex).limit(limit);
+    if (!blogs) {
+      return res.status(404).json({ error: "Blogs not found" });
+    }
+    res.json({
+      message: "succefully fetch all blogs",
+      blogs,
+      currentPage: page,
+      totalPages,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "There wan an error in server side" });

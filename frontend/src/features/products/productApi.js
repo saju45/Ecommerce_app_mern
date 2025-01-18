@@ -3,10 +3,18 @@ import { apiSlice } from "../api/apiSlice";
 export const productApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getAllProducts: builder.query({
-      query: (searchTerm) => {
-        console.log("searchTerm : ", searchTerm);
+      query: ({ searchTerm, category, minPrice, maxPrice, page }) => {
         return {
-          url: `/products/fetchAllProduct?search=${searchTerm}`,
+          url: `/products/fetchAllProduct?search=${searchTerm}&category=${category}&minPrice=${minPrice}&maxPrice=${maxPrice}&page=${page}&limit=10`,
+          method: "GET",
+        };
+      },
+      providesTags: ["products"],
+    }),
+    getProducts: builder.query({
+      query: () => {
+        return {
+          url: `/products/allProducts`,
           method: "GET",
         };
       },
@@ -65,6 +73,7 @@ export const productApi = apiSlice.injectEndpoints({
 
 export const {
   useGetAllProductsQuery,
+  useGetProductsQuery,
   useGetNewArrivalsQuery,
   useGetSingleProductQuery,
   useGetProductByCategoryQuery,
