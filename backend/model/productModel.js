@@ -33,6 +33,11 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    shipping: {
+      available: { type: Boolean, default: true },
+      regions: [String],
+      cost: { type: Number, default: 0 },
+    },
     images: [],
 
     reviews: [

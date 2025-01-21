@@ -1,7 +1,7 @@
 import Product from "../model/productModel.js";
 
 export const getAllProducts = async (req, res) => {
-  const { search, category, minPrice, maxPrice } = req.query;
+  const { search, category, minPrice, maxPrice, brand, region } = req.query;
   //pagination
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
@@ -13,6 +13,15 @@ export const getAllProducts = async (req, res) => {
 
   if (search) query.name = { $regex: search, $options: "i" };
   if (category) query.category = category;
+  if (brand) query.brand = brand;
+  //my database is shipping.rigions
+  if (region) {
+    if (Array.isArray(region)) {
+      query["shipping.regions"] = { $in: region };
+    } else {
+      query["shipping.regions"] = region;
+    }
+  }
 
   if (minPrice || maxPrice) {
     query.price = {};
@@ -49,6 +58,19 @@ export const getAllProductsNoPagination = async (req, res) => {
   }
 };
 
+//get existing shippin rigions
+export const getShippingRegions = async (req, res) => {
+  try {
+    // Fetch unique shipping regions from all products
+    const regions = await Product.distinct("shipping.regions");
+    res.status(200).json(regions);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch shipping regions", error });
+  }
+};
+
 //get newarrivals product
 export const getNewArrivalsProducts = async (req, res) => {
   try {
@@ -59,6 +81,22 @@ export const getNewArrivalsProducts = async (req, res) => {
     }
 
     res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+//get brand name by category
+export const getBrandNameByCategory = async (req, res) => {
+  try {
+    const { category } = req.query;
+
+    if (!category) {
+      const brand = await Product.distinct("brand").sort({ brand: 1 });
+      return res.json(brand);
+    }
+    const brand = await Product.distinct("brand", { category });
+    return res.json(brand);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }

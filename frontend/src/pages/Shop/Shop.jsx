@@ -60,40 +60,42 @@ const Shop = () => {
           </div>
 
           {/* Pagination Section */}
-          <div
-            id="pagination"
-            className="text-center mb-6 flex flex-row items-center justify-center gap-4"
-          >
-            <button
-              className="no-underline bg-[#088178] disabled:bg-[#A0C7C3] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
+          {totalPages > 1 && (
+            <div
+              id="pagination"
+              className="text-center mb-6 flex flex-row items-center justify-center gap-4"
             >
-              Previous
-            </button>
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-              (page) => (
-                <button
-                  key={page}
-                  className={`no-underline bg-[#088178] text-white px-5 py-3 rounded font-semibold inline-flex items-center ${
-                    page === data?.currentPage
-                      ? "border-2 border-white bg-green-500"
-                      : ""
-                  }`}
-                  onClick={() => handlePageChange(page)}
-                >
-                  {page}
-                </button>
-              )
-            )}
-            <button
-              className="no-underline bg-[#088178] disabled:bg-[#A0C7C3] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page === totalPages}
-            >
-              Next
-            </button>
-          </div>
+              <button
+                className="no-underline bg-[#088178] disabled:bg-[#A0C7C3] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 1}
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (page) => (
+                  <button
+                    key={page}
+                    className={`no-underline bg-[#088178] text-white px-5 py-3 rounded font-semibold inline-flex items-center ${
+                      page === data?.currentPage
+                        ? "border-2 border-white bg-green-500"
+                        : ""
+                    }`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+              <button
+                className="no-underline bg-[#088178] disabled:bg-[#A0C7C3] text-white px-5 py-3 rounded font-semibold inline-flex items-center"
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

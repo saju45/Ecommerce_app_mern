@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addToCart,
+  clearCart,
   getCartData,
   removeFromCart,
   updateCartQuantity,
@@ -21,6 +22,14 @@ router.put(
   authMiddlware.verify,
   authMiddlware.authorizeRole("user"),
   removeFromCart
+);
+
+//clear cart
+router.put(
+  "/clearCart",
+  authMiddlware.verify,
+  authMiddlware.authorizeRole("user"),
+  clearCart
 );
 
 router.put(

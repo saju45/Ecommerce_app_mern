@@ -132,6 +132,16 @@ export const removeFromCart = async (req, res) => {
   }
 };
 
+export const clearCart = async (req, res) => {
+  try {
+    const result = await Cart.deleteOne({ userId: req.user._id });
+    res.status(200).json({ message: "Cart cleared successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("There was an server side error");
+  }
+};
+
 export const getCartData = async (req, res) => {
   try {
     const data = await Cart.findOne({ userId: req.user._id });

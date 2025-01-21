@@ -8,6 +8,7 @@ import blogRouter from "./routes/blogRoute.js";
 import cartRouter from "./routes/cartRoute.js";
 import categoryRouter from "./routes/categoryRoute.js";
 import emailRouter from "./routes/emailRouter.js";
+import orderRouter from "./routes/orderRoute.js";
 import productRouter from "./routes/productRoute.js";
 import userRouter from "./routes/userRoute.js";
 
@@ -46,6 +47,7 @@ app.use("/users", userRouter);
 app.use("/admin", adminRouter);
 app.use("/products", productRouter);
 app.use("/cart", cartRouter);
+app.use("/orders", orderRouter);
 app.use("/blog", blogRouter);
 app.use("/categories", categoryRouter);
 app.use("/email", emailRouter);

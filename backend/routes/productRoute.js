@@ -4,9 +4,11 @@ import {
   deleteProduct,
   getAllProducts,
   getAllProductsNoPagination,
+  getBrandNameByCategory,
   getNewArrivalsProducts,
   getProductByCategory,
   getProductById,
+  getShippingRegions,
   updateProduct,
 } from "../controller/productController.js";
 import { authMiddlware } from "../middleware/authMiddleware.js";
@@ -15,6 +17,8 @@ import upload from "../middleware/imageUpload.js";
 const router = express();
 
 router.get("/fetchAllProduct", getAllProducts);
+router.get("/fetchBrands", getBrandNameByCategory);
+router.get("/getShiping", getShippingRegions);
 router.get("/allProducts", getAllProductsNoPagination);
 router.get("/fetchNewArrivals", getNewArrivalsProducts);
 router.get("/:id", getProductById);

@@ -1,26 +1,42 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useGetAllCategoriesQuery } from "../../features/categories/categoryApi.js";
 import {
+  brandSelected,
   categorySelected,
   priceUpdate,
+  regionUpdated,
   removeCategory,
   removePrice,
 } from "../../features/filter/filterSlice.js";
+import {
+  useGetBrandsByCategoryQuery,
+  useGetShippingRegionsQuery,
+} from "../../features/products/productApi.js";
 const Sidebar = () => {
   const { data: categories } = useGetAllCategoriesQuery();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [brand, setBrand] = useState("");
+  const [brands, setBrands] = useState([]);
+  const [shippingAreas, setShippingAres] = useState([]);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const filterItems = useSelector((state) => state.filter);
+
+  const { data: brandsData, isSuccess: brandsIsSuccess } =
+    useGetBrandsByCategoryQuery(filterItems.category);
+  const { data: shippingRegionsData, isSuccess: shippingRegionsIsSuccess } =
+    useGetShippingRegionsQuery();
 
   useEffect(() => {
     if (selectedCategory) {
       dispatch(categorySelected(selectedCategory));
       navigate(`/shop?category=${selectedCategory}`);
+      dispatch(brandSelected(""));
     } else {
       dispatch(removeCategory());
       navigate("/shop");
@@ -35,6 +51,17 @@ const Sidebar = () => {
     }
   }, [selectedCategory, minPrice, maxPrice, navigate, dispatch]);
 
+  useEffect(() => {
+    if (brandsIsSuccess && brandsData) {
+      setBrands(brandsData);
+    }
+  }, [brandsIsSuccess, brandsData]);
+
+  useEffect(() => {
+    if (shippingRegionsIsSuccess && shippingRegionsData) {
+      setShippingAres(shippingRegionsData);
+    }
+  }, [shippingRegionsIsSuccess, shippingRegionsData]);
   return (
     <div className="w-64 p-4 border-r border-gray-200">
       {/* Categories Section */}
@@ -57,10 +84,18 @@ const Sidebar = () => {
       {/* Brand Section */}
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Brand</h3>
-        {["Arpa", "Kids World", "Jim & Jolly", "Farlin"].map((brand) => (
-          <label key={brand} className="flex items-center mb-1">
-            <input type="checkbox" className="mr-2" />
-            {brand}
+        {brands?.map((brnd, index) => (
+          <label key={index} className="flex items-center mb-1">
+            <input
+              type="checkbox"
+              className="mr-2"
+              onChange={(e) => {
+                setBrand(e.target.checked ? brnd : "");
+                dispatch(brandSelected(e.target.checked ? brnd : ""));
+              }}
+              checked={brand === brnd}
+            />
+            {brnd}
           </label>
         ))}
       </div>
@@ -68,9 +103,16 @@ const Sidebar = () => {
       {/* Shipped From Section */}
       <div className="mb-6">
         <h3 className="font-semibold mb-2">Shipped From</h3>
-        {["Dhaka", "Khulna", "Chattogram", "Rajshahi"].map((location) => (
+        {shippingAreas?.map((location) => (
           <label key={location} className="flex items-center mb-1">
-            <input type="checkbox" className="mr-2" />
+            <input
+              type="checkbox"
+              className="mr-2"
+              onChange={(e) => {
+                dispatch(regionUpdated(e.target.checked ? location : ""));
+              }}
+              checked={filterItems.region === location}
+            />
             {location}
           </label>
         ))}

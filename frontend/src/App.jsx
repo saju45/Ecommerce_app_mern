@@ -32,6 +32,7 @@ import Signup from "./pages/signup/Signup";
 
 import Categories from "./components/admin/categories/Categories";
 import ProfileDashboard from "./components/profile/DashBoard";
+import Checkout from "./pages/checkout/Checkout";
 
 function App() {
   const auth = localStorage.getItem("auth");
@@ -60,6 +61,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/product/:id" element={<ProductDescription />} />
           <Route
             path="/profile"
