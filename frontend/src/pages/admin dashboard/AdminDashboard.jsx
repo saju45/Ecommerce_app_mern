@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { IoMdMenu } from "react-icons/io";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useSearchParams } from "react-router-dom";
 import Sidebar from "../../components/admin/sidebar/Sidebar";
 
 import useDebounce from "../../utils/debounce.js";
 const AdminDashboard = () => {
   const [showSidebar, setShowSideBar] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 500);
@@ -23,8 +24,11 @@ const AdminDashboard = () => {
   useEffect(() => {
     if (debouncedQuery) {
       navigate(`/admin-dashboard/products?search=${debouncedQuery}`);
+    } else {
+      searchParams.delete("search");
+      setSearchParams(searchParams);
     }
-  }, [debouncedQuery, navigate]);
+  }, [debouncedQuery, navigate, searchParams, setSearchParams]);
 
   return (
     <div className="flex h-screen bg-gray-100 relative">

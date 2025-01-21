@@ -46,7 +46,12 @@ export const getAllProducts = async (req, res) => {
 //get all product with out pagination
 export const getAllProductsNoPagination = async (req, res) => {
   try {
-    const products = await Product.find();
+    const { search } = req.query;
+
+    let query = {};
+
+    if (search) query.name = { $regex: search, $options: "i" };
+    const products = await Product.find(query);
 
     if (!products) {
       return res.status(404).json({ error: "Products not found" });

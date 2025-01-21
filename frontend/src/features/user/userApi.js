@@ -9,6 +9,15 @@ export const userApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["profile"],
     }),
+    getAllUser: builder.query({
+      query: ({ page, keyword }) => {
+        return {
+          url: `/users/getAllUser?page=${page}&keyword=${keyword}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["users"],
+    }),
     updateProfileImage: builder.mutation({
       query: (data) => {
         return {
@@ -19,7 +28,21 @@ export const userApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: ["profile"],
     }),
+    deleteUser: builder.mutation({
+      query: (userId) => {
+        return {
+          url: `/users/deleteUser/${userId}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["users"],
+    }),
   }),
 });
 
-export const { useGetUserInfoQuery, useUpdateProfileImageMutation } = userApi;
+export const {
+  useGetUserInfoQuery,
+  useUpdateProfileImageMutation,
+  useGetAllUserQuery,
+  useDeleteUserMutation,
+} = userApi;

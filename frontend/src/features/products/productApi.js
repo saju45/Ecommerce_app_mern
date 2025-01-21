@@ -38,9 +38,9 @@ export const productApi = apiSlice.injectEndpoints({
       }),
     }),
     getProducts: builder.query({
-      query: () => {
+      query: (search) => {
         return {
-          url: `/products/allProducts`,
+          url: `/products/allProducts?search=${search ? search : ""}`,
           method: "GET",
         };
       },

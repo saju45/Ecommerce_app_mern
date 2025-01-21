@@ -149,3 +149,61 @@ export const updateProfilePic = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const getUsers = async (req, res) => {
+  try {
+    // pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const total = await User.countDocuments();
+    const totalPages = Math.ceil(total / limit);
+    if (total === 0) {
+      return res.status(404).json({ error: "No users found" });
+    }
+
+    let users;
+    // search users
+    const keyword = req.query.keyword?.toLowerCase();
+    if (keyword) {
+      const regex = new RegExp(keyword, "i");
+      users = await User.find({
+        $or: [{ name: regex }, { email: regex }],
+      })
+        .skip(startIndex)
+        .limit(limit)
+        .select({ password: 0 });
+    } else {
+      users = await User.find()
+        .skip(startIndex)
+        .limit(limit)
+        .select({ password: 0 });
+    }
+
+    if (!users) {
+      return res.status(404).json({ error: "Users not found" });
+    }
+    res.status(200).json({
+      users,
+      currentPage: page,
+      totalPages,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "There was an error in server side" });
+  }
+};
+
+//delete user
+export const deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findByIdAndDelete(userId);
+
+    res.status(201).json({ message: "user deleted successfully", user });
+  } catch (error) {
+    res.status(500).json({ error: "There was an error in server side" });
+  }
+};

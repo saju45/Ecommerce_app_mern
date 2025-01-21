@@ -1,44 +1,65 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import {
+  useDeleteUserMutation,
+  useGetAllUserQuery,
+} from "../../../features/user/userApi";
 
 const CustomerList = () => {
   // Sample data for customers
-  const [customers, setCustomers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "123-456-7890",
-      orders: 5,
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      phone: "987-654-3210",
-      orders: 3,
-    },
-    {
-      id: 3,
-      name: "Michael Lee",
-      email: "michael@example.com",
-      phone: "555-123-4567",
-      orders: 7,
-    },
-    {
-      id: 4,
-      name: "Sarah Connor",
-      email: "sarah@example.com",
-      phone: "444-888-9999",
-      orders: 2,
-    },
-    {
-      id: 5,
-      name: "Chris Evans",
-      email: "chris@example.com",
-      phone: "222-333-4444",
-      orders: 4,
-    },
-  ]);
+  const [customers, setCustomers] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const name = searchParams.get("name") || "";
+
+  // Fetch all users
+  const { data: allUsers, isSuccess } = useGetAllUserQuery({
+    page,
+    keyword: name,
+  });
+
+  const [deleteUser] = useDeleteUserMutation();
+
+  const handleSearch = (event) => {
+    const { name, value } = event.target;
+    setSearchTerm(value);
+
+    if (event.target.value) {
+      searchParams.set(name, value);
+    } else {
+      searchParams.delete(name);
+    }
+
+    setSearchParams(searchParams); // Update the URL
+  };
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  const handleDelete = async (userId) => {
+    try {
+      const response = await deleteUser(userId);
+      toast.success(response.data.message);
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.error);
+    }
+  };
+
+  useEffect(() => {
+    if (isSuccess && allUsers) {
+      setCustomers(allUsers?.users);
+      setTotalPages(allUsers?.totalPages);
+      setPage(allUsers?.currentPage);
+    }
+  }, [isSuccess, allUsers]);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -48,8 +69,11 @@ const CustomerList = () => {
           <h2 className="text-2xl font-bold text-gray-800">Customer List</h2>
           <input
             type="text"
+            name="name"
             placeholder="Search customers..."
             className="p-2 border border-gray-300 rounded-md w-64"
+            value={searchTerm}
+            onChange={handleSearch}
           />
         </div>
 
@@ -80,9 +104,9 @@ const CustomerList = () => {
             </thead>
             <tbody>
               {customers.map((customer) => (
-                <tr key={customer.id} className="hover:bg-gray-50">
+                <tr key={customer._id} className="hover:bg-gray-50">
                   <td className="border border-gray-200 p-3 text-gray-800">
-                    {customer.id}
+                    {customer._id}
                   </td>
                   <td className="border border-gray-200 p-3 text-gray-800">
                     {customer.name}
@@ -94,13 +118,16 @@ const CustomerList = () => {
                     {customer.phone}
                   </td>
                   <td className="border border-gray-200 p-3 text-gray-800">
-                    {customer.orders}
+                    {customer.orders?.length}
                   </td>
                   <td className="border border-gray-200 p-3 text-gray-800">
                     {/* <button className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 mr-2">
                       Edit
                     </button> */}
-                    <button className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                    <button
+                      className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                      onClick={() => handleDelete(customer?._id)}
+                    >
                       Delete
                     </button>
                   </td>
@@ -113,13 +140,21 @@ const CustomerList = () => {
         {/* Pagination */}
         <div className="flex justify-between items-center mt-4">
           <p className="text-gray-600">
-            Showing 1 to {customers.length} of {customers.length} entries
+            Showing {page} to {totalPages} of {customers?.length} entries
           </p>
           <div className="flex items-center space-x-2">
-            <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+            <button
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+            >
               Previous
             </button>
-            <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+            <button
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+            >
               Next
             </button>
           </div>

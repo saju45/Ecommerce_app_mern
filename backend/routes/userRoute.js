@@ -1,7 +1,9 @@
 import express from "express";
 import {
   changePassword,
+  deleteUser,
   getUserInfo,
+  getUsers,
   login,
   logout,
   register,
@@ -36,6 +38,20 @@ router.get(
   authMiddlware.verify,
   authMiddlware.authorizeRole("user"),
   getUserInfo
+);
+
+router.get(
+  "/getAllUser",
+  authMiddlware.verify,
+  authMiddlware.authorizeRole("admin"),
+  getUsers
+);
+
+router.delete(
+  "/deleteUser/:userId",
+  authMiddlware.verify,
+  authMiddlware.authorizeRole("admin"),
+  deleteUser
 );
 
 export default router;
