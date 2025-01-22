@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 //cors middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://ecommerce-app-frontend-mqhg.onrender.com",
     credentials: true,
   })
 );
