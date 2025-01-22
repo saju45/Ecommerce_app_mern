@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 
 import { RiStarFill, RiStarHalfLine, RiStarLine } from "react-icons/ri";
+import { useSelector } from "react-redux";
 
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -11,6 +12,7 @@ import {
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
   const { data: cartData } = useGetCartDataQuery();
   const alreadyHasAddToCart = cartData?.items.findIndex(
@@ -19,18 +21,22 @@ const ProductCard = ({ product }) => {
 
   const [addToCart] = useAddToCartMutation();
   const handleAddToCart = async () => {
-    try {
-      const response = await addToCart({
-        productid: product?._id,
-        quantity: 1,
-        price: product?.price,
-        name: product?.name,
-        image: product?.images[0],
-      });
-      toast.success(response.data.message);
-    } catch (error) {
-      console.log(error);
-      toast.error(error.response.data.error);
+    if (isLoggedIn) {
+      try {
+        const response = await addToCart({
+          productid: product?._id,
+          quantity: 1,
+          price: product?.price,
+          name: product?.name,
+          image: product?.images[0],
+        });
+        toast.success(response.data.message);
+      } catch (error) {
+        console.log(error);
+        toast.error(error.response.data.error);
+      }
+    } else {
+      navigate("/login");
     }
   };
 

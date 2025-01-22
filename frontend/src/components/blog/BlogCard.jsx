@@ -18,7 +18,6 @@ const BlogCard = ({ blog }) => {
           />
         </div>
       </div>
-      {/* Date Section */}
 
       {/* Blog Details Section */}
       <div className="w-full md:w-2/3 flex flex-col justify-start">

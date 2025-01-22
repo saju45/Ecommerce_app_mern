@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  link: "http://localhost:1000",
+  link: "https://ecommerce-app-backend-z90u.onrender.com",
 };
 
 const prodSlice = createSlice({
