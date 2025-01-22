@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useLoginMutation } from "../../features/auth/authApi";
@@ -6,7 +7,8 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [login, { data, isSuccess }] = useLoginMutation();
-
+  const authS = useSelector((state) => state.auth);
+  console.log("authS : ", authS);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -17,10 +19,12 @@ const Login = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      navigate("/");
+      if (authS?.user?.role === "user") {
+        navigate("/");
+      }
       toast.success(data.message);
     }
-  }, [isSuccess, navigate, data]);
+  }, [isSuccess, navigate, data, authS]);
 
   return (
     <div className="h-screen flex items-center justify-center">

@@ -12,6 +12,7 @@ const CartCard = ({ item }) => {
   const [quantity, setQuantity] = useState(item?.quantity);
   const subTotal = item?.price * item?.quantity;
   const [updateCartQuantity] = useUpdateCartQuantityMutation();
+
   const [deleteFromCart] = useDeleteFromCartMutation();
 
   const handleRemovedCartData = async (productid) => {

@@ -4,8 +4,9 @@ import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const user = useSelector((state) => state.auth.user);
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn || user?.role !== "user") {
     return <Navigate to="/login" />;
   }
 

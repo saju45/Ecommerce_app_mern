@@ -9,6 +9,10 @@ import SearchBar from "./Searchbar";
 const Navbar = () => {
   const [cartData, setCartData] = useState([]);
 
+  const [logout] = useLogoutMutation();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const user = useSelector((state) => state.auth.user);
+
   const links = [
     { name: "Home", to: "/" },
     { name: "Shop", to: "/shop" },
@@ -17,9 +21,10 @@ const Navbar = () => {
     { name: "Contact", to: "/contact" },
   ];
 
-  const { data: cartDataQuery, isSuccess } = useGetCartDataQuery();
-  const [logout] = useLogoutMutation();
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const { data: cartDataQuery, isSuccess } = useGetCartDataQuery(
+    {},
+    { skip: !user?.role === "user" }
+  );
 
   const navigate = useNavigate();
 
@@ -64,7 +69,7 @@ const Navbar = () => {
             </Link>
           ))}
         </ul>
-        {isLoggedIn && (
+        {isLoggedIn && user?.role === "user" && (
           <div className="dropdown dropdown-end">
             <div
               tabIndex={0}

@@ -54,6 +54,7 @@ export const authApi = apiSlice.injectEndpoints({
           dispatch(
             userLogin({
               user: response.data.user,
+              token: response.data.token,
             })
           );
         } catch (error) {
@@ -96,10 +97,10 @@ export const authApi = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(args, { queryFulfilled, dispatch }) {
         try {
-          await queryFulfilled;
+          const response = await queryFulfilled;
           localStorage.removeItem("auth");
-          dispatch(userLogout);
-          // Navigate to login page
+
+          dispatch(userLogout({}));
         } catch (error) {
           console.error("Error fetching product:", error);
         }

@@ -36,11 +36,12 @@ import Checkout from "./pages/checkout/Checkout";
 
 function App() {
   const auth = localStorage.getItem("auth");
+  const local = JSON.parse(auth);
 
   const dispatch = useDispatch();
 
   if (auth) {
-    dispatch(login());
+    dispatch(login({ user: local?.user }));
   }
 
   return (
