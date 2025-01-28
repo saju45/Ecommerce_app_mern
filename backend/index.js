@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 //cors middleware
 app.use(
   cors({
-    origin: "https://shanawaj-ecommerce.netlify.app/",
+    origin: "https://shanawaj-ecommerce.netlify.app",
     credentials: true,
   })
 );
